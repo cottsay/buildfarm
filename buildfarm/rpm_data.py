@@ -1,5 +1,4 @@
 #!/usr/bin/env python
- # -*- coding: utf8 -*-
 
 from __future__ import print_function
 
@@ -16,11 +15,7 @@ import yaml
 from rospkg.distro import distro_uri
 from apt_data import RosdistroVersion, load_url
 
-# TODO: Fedora Mapping Workaround
-fedora_ver = {u'schrödinger’s': 19,
-               'heisenbug': 20}
-fedora_rel = {v: k for k, v in fedora_ver.items()}
-# End Workaround
+from fedora_vmap import fedora_ver
 
 def get_version_data(rootdir, rosdistro_name, ros_repos, distro_arches, update_cache=True):
     rosdistro_data = RosdistroData(rosdistro_name)

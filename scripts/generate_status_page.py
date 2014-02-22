@@ -9,7 +9,8 @@ import time
 import re
 
 from buildfarm.apt_data import get_version_data as get_apt_version_data
-from buildfarm.rpm_data import get_version_data as get_rpm_version_data, fedora_ver
+from buildfarm.fedora_vmap import fedora_ver
+from buildfarm.rpm_data import get_version_data as get_rpm_version_data
 from buildfarm.status_page import get_distro_arches, render_csv, transform_csv_to_html
 from rosdistro import get_cached_distribution, get_index, get_index_url
 
