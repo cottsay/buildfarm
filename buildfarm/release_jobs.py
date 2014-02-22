@@ -70,7 +70,7 @@ def compute_missing(distros, arches, fqdn, rosdistro, sourcedeb_only=False):
             continue
 
         missing[short_package_name] = []
-        for d in target_distros:
+        for d in target_distros['ubuntu']:
             if not repo.deb_in_repo(repo_url, deb_name, str(expected_version) + d, d, arch='na', source=True):
                 missing[short_package_name].append('%s_source' % d)
             if not sourcedeb_only:
@@ -84,7 +84,7 @@ def compute_missing(distros, arches, fqdn, rosdistro, sourcedeb_only=False):
         dist = load_distro(distro_uri(rosdistro))
 
         distro_arches = []
-        for d in target_distros:
+        for d in target_distros['ubuntu']:
             for a in arches:
                 distro_arches.append((d, a))
 

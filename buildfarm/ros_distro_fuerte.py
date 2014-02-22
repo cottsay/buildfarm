@@ -137,4 +137,4 @@ def get_target_distros(rosdistro):
     if len(my_targets) != 1:
         print("Must have exactly one entry for rosdistro %s in targets.yaml" % rosdistro)
         sys.exit(1)
-    return my_targets[0][rosdistro]
+    return {'ubuntu': my_targets[0][rosdistro]}

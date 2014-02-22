@@ -37,11 +37,14 @@ def get_distro_arches(arches, rosdistro):
     else:
         from buildfarm.ros_distro import get_target_distros
 
-    distros = get_target_distros(rosdistro)
-    return [(d, a) for d in distros for a in arches]
+    vda = {}
+    variants = get_target_distros(rosdistro)
+    for v in variants:
+        vda[v] = [(d, a) for d in variants[v] for a in arches]
+    return vda
 
 
-def make_versions_table(rd_data, apt_data,
+def make_versions_table(rd_data, pkg_data,
                         da_strs, repo_names, rosdistro):
     '''
     Returns an in-memory table with all the information that will be displayed:
@@ -52,7 +55,7 @@ def make_versions_table(rd_data, apt_data,
     right_columns = [(da_str, object) for da_str in da_strs]
     columns = left_columns + right_columns
 
-    distro_debian_names = [debianize_package_name(rosdistro, pkg.name) for pkg in rd_data.packages.values()]
+    distro_pkg_names = [debianize_package_name(rosdistro, pkg.name) for pkg in rd_data.packages.values()]
 
     # prefixes of other ros distros
     prefixes = ['ros-electric-', 'ros-fuerte-', 'ros-unstable-']
@@ -62,47 +65,46 @@ def make_versions_table(rd_data, apt_data,
     if rosdistro_prefix in prefixes:
         prefixes.remove(rosdistro_prefix)
 
-    non_distro_debian_names = []
-    for debian_name in apt_data.debian_packages:
+    non_distro_pkg_names = []
+    for pkg_name in pkg_data.get_packages():
         skip = False
         # skip packages from other ros distros
         for prefix in prefixes:
-            if debian_name.startswith(prefix):
+            if pkg_name.startswith(prefix):
                 skip = True
         if skip:
             continue
         # skip packages which are in the rosdistro
-        if debian_name in distro_debian_names:
+        if pkg_name in distro_pkg_names:
             continue
         # skip packages without prefix of this ros distro
-        if not debian_name.startswith(rosdistro_prefix):
+        if not pkg_name.startswith(rosdistro_prefix):
             continue
-        non_distro_debian_names.append(debian_name)
+        non_distro_pkg_names.append(pkg_name)
 
-    table = np.empty(len(rd_data.packages) + len(non_distro_debian_names),
+    table = np.empty(len(rd_data.packages) + len(non_distro_pkg_names),
                      dtype=columns)
 
     # add all packages coming from the distro (wet, dry, variant)
-    for i, pkg_data in enumerate(rd_data.packages.values()):
-        table['name'][i] = pkg_data.name
+    for i, pkg_vars in enumerate(rd_data.packages.values()):
+        table['name'][i] = pkg_vars.name
         repo_name = ''
         try:
-            repo_name = rd_data.rosdistro_dist.release_packages[pkg_data.name].repository_name
+            repo_name = rd_data.rosdistro_dist.release_packages[pkg_vars.name].repository_name
         except KeyError:
             pass
         table['repo'][i] = repo_name
-        table['version'][i] = pkg_data.version
-        table['wet'][i] = pkg_data.type
+        table['version'][i] = pkg_vars.version
+        table['wet'][i] = pkg_vars.type
         for da_str in da_strs:
-            debian_name = debianize_package_name(rosdistro, pkg_data.name)
-            versions = get_versions(apt_data, debian_name,
+            pkg_name = debianize_package_name(rosdistro, pkg_vars.name)
+            versions = get_versions(pkg_data, pkg_name,
                                     repo_names, da_str)
             table[da_str][i] = add_version_cell(versions)
 
     i = len(rd_data.packages)
-    for debian_name in non_distro_debian_names:
+    for pkg_name in non_distro_pkg_names:
         #undebianized_pkg_name = undebianize_package_name(rosdistro, pkg_name)
-        pkg_name = debian_name
         if pkg_name.startswith(rosdistro_prefix):
             pkg_name = pkg_name[len(rosdistro_prefix):]
         table['name'][i] = pkg_name
@@ -111,7 +113,7 @@ def make_versions_table(rd_data, apt_data,
         table['wet'][i] = 'unknown'
         all_versions = []
         for da_str in da_strs:
-            versions = get_versions(apt_data, debian_name,
+            versions = get_versions(pkg_data, pkg_name,
                                     repo_names, da_str)
             table[da_str][i] = add_version_cell(versions)
             all_versions.extend(versions)
@@ -124,10 +126,10 @@ def make_versions_table(rd_data, apt_data,
     return table
 
 
-def get_versions(apt_data, pkg_name, repo_names, da_str):
+def get_versions(pkg_data, pkg_name, repo_names, da_str):
     versions = []
     for repo_name in repo_names:
-        v = apt_data.get_version(pkg_name, repo_name, da_str)
+        v = pkg_data.get_version(pkg_name, repo_name, da_str)
         v = str(v)
         v = strip_version_suffix(v)
         versions.append(v)
@@ -175,7 +177,7 @@ def get_dist_arch_str(d, a):
     return "%s_%s" % (d, a)
 
 
-def render_csv(rd_data, apt_data, outfile, rosdistro,
+def render_csv(rd_data, pkg_data, outfile, rosdistro,
                distro_arches, ros_repos):
     distros = {}
 
@@ -189,9 +191,9 @@ def render_csv(rd_data, apt_data, outfile, rosdistro,
             das.append((d, a))
     da_strs = get_da_strs(das)
 
-    # Make an in-memory table showing the latest deb version for each package.
+    # Make an in-memory table showing the latest pkg version for each package.
     t = make_versions_table(rd_data,
-                            apt_data,
+                            pkg_data,
                             da_strs,
                             ros_repos.keys(),
                             rosdistro)
@@ -316,7 +318,7 @@ def format_row(row, metadata_columns):
         [is_public_changing_on_sync(c) for c in row[4:]]
     regression = [False] * 4 + \
         [is_regression(c) for c in row[4:]]
-    # Flag if this is dry or a variant so as not to show sourcedebs as red
+    # Flag if this is dry or a variant so as not to show source pkgs as red
     no_source = row[3] in ['variant', 'dry']
     # ignore source columns for dry/variant when deciding of columns are homogeneous
     diff_columns = [c for i, c in enumerate(row) if i > 3 and (not no_source or i % 3 - 1)]
@@ -326,7 +328,7 @@ def format_row(row, metadata_columns):
     metadata = [None] * 4 + [md for md in metadata_columns[4:]]
     # for unknown packages the latest version number is only a guess so don't mark missing cells
     latest_version = row[2] if row[3] != 'unknown' else None
-    # only pass no_source if this is a sourcedeb entry
+    # only pass no_source if this is a source pkg entry
     row = row[:4] + [format_versions_cell(get_cell_versions(row[i]),
                                           latest_version,
                                           no_source and metadata[i]['is_source'])
