@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <project>
   <actions/>
-  <description>Generate status page for Indigo.&#xd;
+  <description>Generate RPM status page for Groovy.&#xd;
 &#xd;
 Generated from buildfarm/resources/static_jobs. Do not edit on Jenkins but in the repository.</description>
   <logRotator class="hudson.tasks.LogRotator">
@@ -21,7 +21,7 @@ Generated from buildfarm/resources/static_jobs. Do not edit on Jenkins but in th
     <configVersion>2</configVersion>
     <userRemoteConfigs>
       <hudson.plugins.git.UserRemoteConfig>
-        <url>git://github.com/ros-infrastructure/buildfarm.git</url>
+        <url>git://github.com/cottsay/buildfarm.git</url>
       </hudson.plugins.git.UserRemoteConfig>
     </userRemoteConfigs>
     <branches>
@@ -37,7 +37,7 @@ Generated from buildfarm/resources/static_jobs. Do not edit on Jenkins but in th
       </hudson.plugins.git.extensions.impl.RelativeTargetDirectory>
     </extensions>
   </scm>
-  <assignedNode>debbuild</assignedNode>
+  <assignedNode>rpmbuild</assignedNode>
   <canRoam>false</canRoam>
   <disabled>false</disabled>
   <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
@@ -57,16 +57,16 @@ set -o errexit
 
 export PYTHONPATH=$WORKSPACE/monitored_vcs
 
-$WORKSPACE/monitored_vcs/scripts/generate_status_page.py indigo --basedir $WORKSPACE/indigo_pkg_cache
-scp -o StrictHostKeyChecking=no -r $WORKSPACE/indigo_pkg_cache/indigo.* $WORKSPACE/monitored_vcs/resources/css $WORKSPACE/monitored_vcs/resources/js rosbot@ros.osuosl.org:/var/www/www.ros.org/debbuild/
+$WORKSPACE/monitored_vcs/scripts/generate_status_page.py groovy --basedir $WORKSPACE/groovy_pkg_cache --variant fedora
+scp -o StrictHostKeyChecking=no -r $WORKSPACE/groovy_pkg_cache/groovy.* $WORKSPACE/monitored_vcs/resources/css $WORKSPACE/monitored_vcs/resources/js rosbot@csc.mcs.sdsmt.edu:/mnt/storage/ros_build_status/
 
-$WORKSPACE/monitored_vcs/scripts/generate_status_page.py indigo --basedir $WORKSPACE/indigo_mirror_pkg_cache --resources .. --shadow-repo http://packages.ros.org/ros-shadow-fixed/ --public-repo http://packages.ros.org/ros/
-scp -o StrictHostKeyChecking=no $WORKSPACE/indigo_mirror_pkg_cache/indigo.* rosbot@ros.osuosl.org:/var/www/www.ros.org/debbuild/mirror/</command>
+$WORKSPACE/monitored_vcs/scripts/generate_status_page.py groovy --basedir $WORKSPACE/groovy_mirror_pkg_cache --resources .. --shadow-repo http://packages.ros.org/ros-shadow-fixed/ --public-repo http://packages.ros.org/ros/ --variant fedora
+scp -o StrictHostKeyChecking=no $WORKSPACE/groovy_mirror_pkg_cache/groovy.* rosbot@csc.mcs.sdsmt.edu:/mnt/storage/ros_build_status/mirror/</command>
     </hudson.tasks.Shell>
   </builders>
   <publishers>
     <hudson.tasks.Mailer plugin="mailer@1.8">
-      <recipients>ros-buildfarm-status@googlegroups.com</recipients>
+      <recipients>logans@cottsay.net</recipients>
       <dontNotifyEveryUnstableBuild>true</dontNotifyEveryUnstableBuild>
       <sendToIndividuals>false</sendToIndividuals>
     </hudson.tasks.Mailer>
