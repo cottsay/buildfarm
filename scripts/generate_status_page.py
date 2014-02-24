@@ -52,8 +52,8 @@ def parse_options(args=sys.argv[1:]):
     p.add_argument('--da',
                    nargs='+',
                    help='Distro/Arch pairs to query')
-    p.add_argument('--variant', default='ubuntu',
-                   help='Linux variant (ubuntu, fedora)')
+    p.add_argument('--platform', default='ubuntu',
+                   help='Linux platform (ubuntu, fedora)')
     return p.parse_args(args)
 
 
@@ -62,12 +62,12 @@ if __name__ == '__main__':
 
     start_time = time.localtime()
 
-    ros_repos = {'ros': args.public_repo + '/' + args.variant,
-                 'shadow-fixed': args.shadow_repo + '/' + args.variant,
-                 'building': args.build_repo + '/' + args.variant}
+    ros_repos = {'ros': args.public_repo + '/' + args.platform,
+                 'shadow-fixed': args.shadow_repo + '/' + args.platform,
+                 'building': args.build_repo + '/' + args.platform}
 
     # TODO: SDSM&T/building workarounds
-    if args.variant == 'fedora':
+    if args.platform == 'fedora':
         ros_repos['ros'] = 'http://csc.mcs.sdsmt.edu/smd-ros/fedora'
         ros_repos['shadow-fixed'] = 'http://csc.mcs.sdsmt.edu/smd-ros-shadow-fixed/fedora'
         ros_repos['building'] = 'http://csc.mcs.sdsmt.edu/smd-ros-building/fedora'
@@ -75,7 +75,7 @@ if __name__ == '__main__':
         ros_repos['building'] = args.build_repo
     # End workarounds
 
-    if args.variant == 'fedora':
+    if args.platform == 'fedora':
         if 'amd64' in args.arches:
           args.arches.remove('amd64')
           args.arches.append('x86_64')
@@ -92,11 +92,11 @@ if __name__ == '__main__':
     elif args.distros:
         distro_arches = [(d, a) for d in args.distros for a in args.arches]
     else:
-        distro_arches = get_distro_arches(args.arches, args.rosdistro)[args.variant]
+        distro_arches = get_distro_arches(args.arches, args.rosdistro)[args.platform]
 
     csv_file = os.path.join(args.basedir, '%s.csv' % args.rosdistro)
     if not args.skip_csv:
-        if args.variant == 'fedora':
+        if args.platform == 'fedora':
             print('Assembling rpm version cache')
             rd_data, pkg_data = get_rpm_version_data(args.basedir, args.rosdistro,
                                                  ros_repos, distro_arches,
@@ -202,7 +202,7 @@ if __name__ == '__main__':
     print('Transforming .csv into .html file...')
     template_file = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', 'resources', 'status_page.html.em')
     with open(csv_file, 'r') as f:
-        if args.variant == 'fedora':
+        if args.platform == 'fedora':
             html = transform_csv_to_html(f, fedora_metadata_builder, args.rosdistro,
                                          start_time, template_file, args.resources, cached_distribution)
         else:
