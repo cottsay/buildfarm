@@ -43,6 +43,8 @@ import os
 import tempfile
 import shutil
 import gzip
+from . import rpminfo
+from .fedora_vmap import fedora_ver
 
 #from .core import debianize_name
 
@@ -51,7 +53,7 @@ class BadRepo(Exception):
     pass
 
 _Packages_cache = {}
-
+_rpm_cache = {}
 
 def get_Packages(repo_url, os_platform, arch, cache=None):
     """
@@ -220,3 +222,19 @@ def get_depends(repo_url, deb_name, os_platform, arch):
 #        return match[0].split('-')[0]
 #    else:
 #        return None
+
+def pkg_in_repo(repo_url, pkg_name, pkg_version, os_distro, arch, use_regex=True, cache=None, source=False, platform='ubuntu'):
+    if platform == 'fedora':
+        return rpm_in_repo(repo_url, pkg_name, pkg_version, os_distro, 'SRPMS' if source else arch, cache)
+    else:
+        return deb_in_repo(repo_url, pkg_name, pkg_version, os_distro, arch, use_regex, cache, source)
+
+def rpm_in_repo(repo_url, pkg_name, pkg_version, os_distro, arch, cache=None):
+    fver = str(fedora_ver[os_distro])
+    repo_path = os.path.join(repo_url, 'linux', fver, arch)
+    version, release = pkg_version.split('-')
+    if cache is None:
+        cache = _rpm_cache
+    if repo_path not in cache:
+        cache[repo_path] = rpminfo.read_repository(repo_path)
+    return bool([p for p in cache[repo_path] if p.name == pkg_name and p.version == version and p.release == release])

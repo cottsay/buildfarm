@@ -17,6 +17,7 @@ from rospkg.distro import load_distro, distro_uri
 from ros_distro import debianize_package_name, get_index_url
 
 from . import repo, jenkins_support
+from .fedora_vmap import fedora_ver
 
 import jenkins
 
@@ -24,7 +25,9 @@ import jenkins
 class Templates(object):
     template_dir = os.path.dirname(__file__)
     config_sourcedeb = pkg_resources.resource_string('buildfarm', 'resources/templates/release_job/config.source.xml.em')  # A config.xml template for sourcedebs.
+    config_sourcerpm = pkg_resources.resource_string('buildfarm', 'resources/templates/release_job/config.sourcerpm.xml.em')  # A config.xml template for sourcerpms.
     command_sourcedeb = pkg_resources.resource_string('buildfarm', 'resources/templates/release_job/source_build.sh.em')  # The bash script that the sourcedebs config.xml runs.
+    command_sourcerpm = pkg_resources.resource_string('buildfarm', 'resources/templates/release_job/sourcerpm_build.sh.em')  # The bash script that the sourcerpms config.xml runs.
     command_binarydeb = pkg_resources.resource_string('buildfarm', 'resources/templates/release_job/binary_build.sh.em')  # builds binary debs.
     config_binarydeb = pkg_resources.resource_string('buildfarm', 'resources/templates/release_job/config.binary.xml.em')  # A config.xml template for something that runs a shell script
     config_dry_binarydeb = pkg_resources.resource_string('buildfarm', 'resources/templates/dry_release/config.xml.em')  # A config.xml template for something that runs a shell script
@@ -38,10 +41,24 @@ def expand(config_template, d):
     return s
 
 
-def compute_missing(distros, arches, fqdn, rosdistro, sourcedeb_only=False):
+def get_full_version(version, distro, platform):
+    if platform == 'fedora':
+        return str(version) + '.fc' + str(fedora_ver[distro])
+    else:
+        return str(version) + distro
+
+
+def compute_missing(distros, arches, fqdn, rosdistro, sourcepkg_only=False, platform='ubuntu'):
     """ Compute what packages are missing from a repo based on the rosdistro files, both wet and dry. """
 
-    repo_url = 'http://%s/repos/building' % fqdn
+    repo_url = 'http://%s/repos/building/%s' % (fqdn, platform)
+
+    # TODO Building Repo Workaround
+    if platform == 'ubuntu':
+        repo_url = 'http://%s/repos/building' % fqdn
+    elif platform == 'fedora':
+        repo_url = 'http://%s/smd-ros-building/%s' % (fqdn, platform)
+    # End Workaround
 
     if rosdistro != 'fuerte':
         from ros_distro import Rosdistro
@@ -54,14 +71,14 @@ def compute_missing(distros, arches, fqdn, rosdistro, sourcedeb_only=False):
     if distros:
         target_distros = distros
     else:
-        target_distros = rd.get_target_distros()
+        target_distros = rd.get_target_distros()[platform]
 
     missing = {}
     for short_package_name in rd.get_package_list():
         #print ('Analyzing WET stack "%s" for "%s"' % (r['url'], target_distros))
 
-        # todo check if sourcedeb is present with the right version
-        deb_name = debianize_package_name(rosdistro, short_package_name)
+        # todo check if sourcepkg is present with the right version
+        pkg_name = debianize_package_name(rosdistro, short_package_name)
         expected_version = rd.get_version(short_package_name, full_version=True)
 
         # Don't report packages as missing if their version is None
@@ -70,21 +87,22 @@ def compute_missing(distros, arches, fqdn, rosdistro, sourcedeb_only=False):
             continue
 
         missing[short_package_name] = []
-        for d in target_distros['ubuntu']:
-            if not repo.deb_in_repo(repo_url, deb_name, str(expected_version) + d, d, arch='na', source=True):
+        for d in target_distros:
+            if not repo.pkg_in_repo(repo_url, pkg_name, get_full_version(expected_version, d, platform), d, arch='na', source=True, platform=platform):
                 missing[short_package_name].append('%s_source' % d)
-            if not sourcedeb_only:
+            if not sourcepkg_only:
                 for a in arches:
-                    if not repo.deb_in_repo(repo_url, deb_name, str(expected_version) + ".*", d, a):
+                    # TODO How the hell am I supposed to deal with this, Ubuntu?
+                    if not repo.pkg_in_repo(repo_url, pkg_name, str(expected_version) + ".*", d, a, platform=platform):
                         missing[short_package_name].append('%s_%s' % (d, a))
 
-    if not sourcedeb_only and rosdistro == 'groovy':
+    if not sourcepkg_only and rosdistro == 'groovy' and not platform == 'fedora':
         #dry stacks
         # dry dependencies
         dist = load_distro(distro_uri(rosdistro))
 
         distro_arches = []
-        for d in target_distros['ubuntu']:
+        for d in target_distros:
             for a in arches:
                 distro_arches.append((d, a))
 
@@ -96,9 +114,9 @@ def compute_missing(distros, arches, fqdn, rosdistro, sourcedeb_only=False):
                 print("Skipping package %s with no version" % s)
                 continue
             missing[s] = []
-            # for each distro arch check if the deb is present. If not trigger the build.
+            # for each distro arch check if the pkg is present. If not trigger the build.
             for (d, a) in distro_arches:
-                if not repo.deb_in_repo(repo_url, debianize_package_name(rosdistro, s), expected_version + ".*", d, a):
+                if not repo.pkg_in_repo(repo_url, debianize_package_name(rosdistro, s), expected_version + ".*", d, a, platform=platform):
                     missing[s].append('%s_%s' % (d, a))
 
     return missing
@@ -250,12 +268,24 @@ def sourcedeb_job_name(packagename):
     return "%(packagename)s_sourcedeb" % locals()
 
 
+def sourcerpm_job_name(packagename):
+    return "%(packagename)s_sourcerpm" % locals()
+
+
 def create_sourcedeb_config(d):
     #Create the bash script the runs inside the job
     #need the command to be safe for xml.
     d['COMMAND'] = escape(expand(Templates.command_sourcedeb, d))
     d['TIMESTAMP'] = datetime.datetime.now()
     return expand(Templates.config_sourcedeb, d)
+
+
+def create_sourcerpm_config(d):
+    #Create the bash script the runs inside the job
+    #need the command to be safe for xml.
+    d['COMMAND'] = escape(expand(Templates.command_sourcerpm, d))
+    d['TIMESTAMP'] = datetime.datetime.now()
+    return expand(Templates.config_sourcerpm, d)
 
 
 def create_binarydeb_config(d):
@@ -278,6 +308,10 @@ def create_sync_binarydeb_config(d):
 
 def binarydeb_job_name(packagename, distro, arch):
     return "%(packagename)s_binarydeb_%(distro)s_%(arch)s" % locals()
+
+
+def binaryrpm_job_name(packagename, distro, arch):
+    return "%(packagename)s_binaryrpm_%(distro)s_%(arch)s" % locals()
 
 
 def calc_child_jobs(packagename, distro, arch, jobgraph):
@@ -333,12 +367,12 @@ def dry_binarydeb_jobs(stackname, dry_maintainers, rosdistro, distros, arches, f
     return jobs
 
 
-def binarydeb_jobs(package, maintainer_emails, distros, arches, apt_target_repository, fqdn, jobgraph, timeout=None, ssh_key_id=None):
+def binarypkg_jobs(package, maintainer_emails, distros, arches, target_repository, fqdn, jobgraph, timeout=None, ssh_key_id=None, platform='ubuntu'):
     jenkins_config = jenkins_support.load_server_config_file(jenkins_support.get_default_catkin_debs_config())
     d = dict(
         ROSDISTRO_INDEX_URL=get_index_url(),
         DISTROS=distros,
-        APT_TARGET_REPOSITORY=apt_target_repository,
+        APT_TARGET_REPOSITORY=target_repository,
         FQDN=fqdn,
         PACKAGE=package,
         NOTIFICATION_EMAIL=' '.join(maintainer_emails),
@@ -347,6 +381,7 @@ def binarydeb_jobs(package, maintainer_emails, distros, arches, apt_target_repos
         SSH_KEY_ID=ssh_key_id
     )
     jobs = []
+    return jobs # TODO XXX
     first_matrix_job = True
     for distro in distros:
         for arch in arches:
@@ -367,7 +402,7 @@ def binarydeb_jobs(package, maintainer_emails, distros, arches, apt_target_repos
     return jobs
 
 
-def sourcedeb_job(package, maintainer_emails, distros, fqdn, release_uri, child_projects, rosdistro, short_package_name, timeout=None, ssh_key_id=None):
+def sourcepkg_job(package, maintainer_emails, distros, fqdn, release_uri, child_projects, rosdistro, short_package_name, timeout=None, ssh_key_id=None, platform='ubuntu'):
     jenkins_config = jenkins_support.load_server_config_file(jenkins_support.get_default_catkin_debs_config())
     d = dict(
         ROSDISTRO_INDEX_URL=get_index_url(),
@@ -384,7 +419,10 @@ def sourcedeb_job(package, maintainer_emails, distros, fqdn, release_uri, child_
         TIMEOUT=timeout,
         SSH_KEY_ID=ssh_key_id
     )
-    return (sourcedeb_job_name(package), create_sourcedeb_config(d))
+    if platform == 'fedora':
+        return (sourcerpm_job_name(package), create_sourcerpm_config(d))
+    else:
+        return (sourcedeb_job_name(package), create_sourcedeb_config(d))
 
 
 def dry_doit(package, dry_maintainers, distros, arches, fqdn, rosdistro, jobgraph, commit, jenkins_instance, packages_for_sync, ssh_key_id):
@@ -410,11 +448,14 @@ def dry_doit(package, dry_maintainers, distros, arches, fqdn, rosdistro, jobgrap
     return (unattempted_jobs, successful_jobs, failed_jobs)
 
 
-def doit(release_uri, package_name, package, distros, arches, apt_target_repository, fqdn, job_graph, rosdistro, short_package_name, commit, jenkins_instance, sourcedeb_timeout=None, binarydeb_timeout=None, ssh_key_id=None):
+def doit(release_uri, package_name, package, distros, arches, target_repository, fqdn, job_graph, rosdistro, short_package_name, commit, jenkins_instance, sourcepkg_timeout=None, binarypkg_timeout=None, ssh_key_id=None, platform='ubuntu'):
     maintainer_emails = [m.email for m in package.maintainers]
-    binary_jobs = binarydeb_jobs(package_name, maintainer_emails, distros, arches, apt_target_repository, fqdn, job_graph, timeout=binarydeb_timeout, ssh_key_id=ssh_key_id)
-    child_projects = zip(*binary_jobs)[0]  # unzip the binary_jobs tuple
-    source_job = sourcedeb_job(package_name, maintainer_emails, distros, fqdn, release_uri, child_projects, rosdistro, short_package_name, timeout=sourcedeb_timeout, ssh_key_id=ssh_key_id)
+    binary_jobs = binarypkg_jobs(package_name, maintainer_emails, distros, arches, target_repository, fqdn, job_graph, timeout=binarypkg_timeout, ssh_key_id=ssh_key_id, platform=platform)
+    if binary_jobs:
+        child_projects = zip(*binary_jobs)[0]  # unzip the binary_jobs tuple
+    else:
+        child_projects = []
+    source_job = sourcepkg_job(package_name, maintainer_emails, distros, fqdn, release_uri, child_projects, rosdistro, short_package_name, timeout=sourcepkg_timeout, ssh_key_id=ssh_key_id, platform=platform)
     jobs = [source_job] + binary_jobs
     successful_jobs = []
     failed_jobs = []
