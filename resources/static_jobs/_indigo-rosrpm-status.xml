@@ -50,17 +50,14 @@ Generated from buildfarm/resources/static_jobs. Do not edit on Jenkins but in th
   <concurrentBuild>false</concurrentBuild>
   <builders>
     <hudson.tasks.Shell>
-      <command>#!/bin/bash -x
-
-#stop on error
-set -o errexit
+      <command>#!/bin/bash -x -e
 
 export PYTHONPATH=$WORKSPACE/monitored_vcs
 
 $WORKSPACE/monitored_vcs/scripts/generate_status_page.py indigo --basedir $WORKSPACE/indigo_pkg_cache --platform fedora
 scp -o StrictHostKeyChecking=no -r $WORKSPACE/indigo_pkg_cache/indigo.* $WORKSPACE/monitored_vcs/resources/css $WORKSPACE/monitored_vcs/resources/js rosbot@csc.mcs.sdsmt.edu:/mnt/storage/ros_build_status/
 
-$WORKSPACE/monitored_vcs/scripts/generate_status_page.py indigo --basedir $WORKSPACE/indigo_mirror_pkg_cache --resources .. --shadow-repo http://packages.ros.org/ros-shadow-fixed/ --public-repo http://packages.ros.org/ros/ --platform fedora
+$WORKSPACE/monitored_vcs/scripts/generate_status_page.py indigo --basedir $WORKSPACE/indigo_mirror_pkg_cache --resources .. --shadow-repo http://csc.mcs.sdsmt.edu/smd-ros-shadow-fixed/ --public-repo http://csc.mcs.sdsmt.edu/smd-ros/ --platform fedora
 scp -o StrictHostKeyChecking=no $WORKSPACE/indigo_mirror_pkg_cache/indigo.* rosbot@csc.mcs.sdsmt.edu:/mnt/storage/ros_build_status/mirror/</command>
     </hudson.tasks.Shell>
   </builders>

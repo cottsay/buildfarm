@@ -51,9 +51,8 @@ Generated from buildfarm/resources/static_jobs. Do not edit on Jenkins but in th
   <concurrentBuild>false</concurrentBuild>
   <builders>
     <hudson.tasks.Shell>
-      <command>#!/bin/bash
+      <command>#!/bin/bash -x -e
 
-ls
 source ./setup.sh
 ./scripts/trigger_missing.py hydro --sourcepkg-only --fqdn csc.mcs.sdsmt.edu --platform fedora --commit</command>
     </hudson.tasks.Shell>
