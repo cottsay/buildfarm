@@ -14,7 +14,7 @@ from buildfarm.rpm_data import get_version_data as get_rpm_version_data
 from buildfarm.status_page import get_distro_arches, render_csv, transform_csv_to_html
 from rosdistro import get_cached_distribution, get_index, get_index_url
 
-JENKINS_HOST = 'http://jenkins.ros.org'
+JENKINS_HOST = 'http://csc.mcs.sdsmt.edu/jenkins'
 
 rpm_ver_re = re.compile('fc(\d+)\.(.+)')
 
@@ -175,8 +175,8 @@ if __name__ == '__main__':
                               'source': 'src'}[arch]
 
         if is_source:
-            column_label = '{rosdistro_short}src{distro_short}'
-            view_name = '{rosdistro_short}src'
+            column_label = '{rosdistro_short}srcrpm{distro_short}'
+            view_name = '{rosdistro_short}srcrpm'
         else:
             column_label = '{rosdistro_short}bin{distro_short}{arch_short}'
             view_name = '{rosdistro_short}bin{distro_short}{arch_short}'
@@ -185,10 +185,10 @@ if __name__ == '__main__':
             view_name.format(**data)
 
         if is_source:
-            job_name = 'ros-{rosdistro}-{{pkg}}.fc{distro_ver}.src'
+            job_name = 'ros-{rosdistro}-{{pkg}}_sourcerpm'
         else:
             data['arch'] = arch
-            job_name = 'ros-{rosdistro}-{{pkg}}.fc{distro_ver}.{arch}'
+            job_name = 'ros-{rosdistro}-{{pkg}}_binaryrpm_{distro}_{arch}'
         data['job_url'] = ('{view_url}job/%s/' % job_name).format(**data)
 
         return data
