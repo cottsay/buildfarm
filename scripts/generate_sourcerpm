@@ -1,24 +1,24 @@
 #!/usr/bin/env python
 
 from __future__ import print_function
+from buildfarm.fedora_vmap import fedora_ver
 import os
 import subprocess
 from subprocess import Popen, CalledProcessError
 import sys
 
-
 def parse_options():
     import argparse
-    parser = argparse.ArgumentParser(description='Creates a set of source debs from a catkin gbp repo. Creates source debs from the latest upstream version.')
+    parser = argparse.ArgumentParser(description='Creates a set of source rpms from a catkin release repo. Creates source rpms from the latest upstream version.')
     parser.add_argument(dest='repo_uri',
-                        help='A read-only git buildpackage repo uri.')
+                        help='A read-only release repo uri.')
     parser.add_argument('package_name', help='The package name for the package we\'re building')
     parser.add_argument('rosdistro', help='Which rosdistro to operate on')
-    parser.add_argument('short_package_name', help='The package name for the package we\'re building, w/o the debian extensions')
-    parser.add_argument('--working', help='A scratch build path. Default: %(default)s', default='/tmp/catkin_gbp')
-    parser.add_argument('--output', help='The result of source deb building will go here. Default: %(default)s', default='/tmp/catkin_debs')
-    parser.add_argument('--repo-fqdn', dest='repo_fqdn', help='The fully qualified domain name of the repo machine. Default: %(default)s', default='repos.ros.org')
-    parser.add_argument('--repo-path', dest='repo_path', help='The path to find the repo on the machine. Default: %(default)s', default='/var/www/repos/building')
+    parser.add_argument('short_package_name', help='The package name for the package we\'re building, w/o the packaging extensions')
+    parser.add_argument('--working', help='A scratch build path. Default: %(default)s', default='/tmp/catkin_release')
+    parser.add_argument('--output', help='The result of source deb building will go here. Default: %(default)s', default='/tmp/catkin_rpms')
+    parser.add_argument('--repo-fqdn', dest='repo_fqdn', help='The fully qualified domain name of the repo machine. Default: %(default)s', default='csc.mcs.sdsmt.edu')
+    parser.add_argument('--repo-path', dest='repo_path', help='The path to find the repo on the machine. Default: %(default)s', default='/mnt/storage/repos/smd-ros-building')
     parser.add_argument('-n', dest='noupload', help='Do not try to upload', action='store_true', default=False)
 
     args = parser.parse_args()
@@ -42,25 +42,14 @@ def call(working_dir, command, pipe=None):
         return output
 
 
-def check_local_repo_exists(repo_path):
-    return os.path.exists(os.path.join(repo_path, '.git'))
+def verify_rpm_tag(repo_uri, package_name, package_version, distro):
+    tags = call(None, ('git', 'ls-remote', '--tags', repo_uri, 'rpm/*'), pipe=subprocess.PIPE)
 
-
-def update_repo(working_dir, repo_path, repo_uri):
-    if check_local_repo_exists(repo_path):
-        print(repo_path)
-        command = ('git', 'fetch', '--all')
-        call(repo_path, command)
-    else:
-        command = ('gbp-clone', repo_uri)
-        call(working_dir, command)
-
-
-def verify_debian_tag(repo_path, package_name, package_version, distro):
-    tags = call(repo_path, ('git', 'tag', '-l', 'debian/*'), pipe=subprocess.PIPE)
-
-    expected_tag = 'debian/%s_%s_%s' % (package_name, package_version, distro)
-    tag_list = tags.split('\n')
+    expected_tag = 'rpm/%s-%s_%s'%(package_name, package_version, distro)
+    tag_list = []
+    for tag in tags.split('\n'):
+        if tag != '':
+            tag_list += [tag.split()[-1].replace('refs/tags/','')]
 
     if expected_tag in tag_list:
         return expected_tag
@@ -69,16 +58,13 @@ def verify_debian_tag(repo_path, package_name, package_version, distro):
     return None
 
 
-def build_source_deb(repo_path, tag, output):
-    call(repo_path, ('git', 'checkout', tag))
-    call(repo_path, ('git', 'buildpackage', '--git-export-dir=%s' % output,
-         # '--git-ignore-branch', '--git-upstream-tree=tag',
-         '--git-ignore-new', '-S', '-uc', '-us', '--lintian-opts', '--suppress-tags', 'newer-standards-version'))
+def build_source_rpm(repo_uri, tag, packagename, fedora_ver, output):
+    call(None, ('mock', '--quiet', '-D', 'fedora ' + str(fedora_ver), '-D', 'dist .fc' + str(fedora_ver), '--buildsrpm', '--resultdir', output, '--scm-enable', '--scm-option', 'git_get=git clone ' + repo_uri + ' ' + packagename, '--scm-option', 'package=' + packagename, '--scm-option', 'branch=' + tag, '--scm-option', 'write_tar=True', '--scm-option', 'spec=rpm/' + packagename + '.spec'))
     print("Successfully created changes in %s" % output)
-    call(repo_path, ['ls', output])
+    call(None, ['ls', output])
 
 
-def upload_source_deb(distros, repo_fqdn, repo_path, input_directory, packagename):
+def upload_source_rpm(distros, repo_fqdn, input_directory, packagename):
     upload_root = "/tmp/upload/%s" % packagename
 
     # clear the upload directory to make sure that there are not old files lying around
@@ -95,7 +81,7 @@ def upload_source_deb(distros, repo_fqdn, repo_path, input_directory, packagenam
 
     # list all the folders where data is expected in one operation
     folder_options = ' '.join(['-f %s' % os.path.join(upload_root, distro) for distro in distros])
-    cmd = ("ssh rosbuild@%(repo_fqdn)s -- PYTHONPATH=/home/rosbuild/reprepro_updater/src python /home/rosbuild/reprepro_updater/scripts/include_folder.py -a source %(folder_options)s -p %(packagename)s -c --delete --invalidate" % locals()).split()
+    cmd = ("ssh rosbuild@%(repo_fqdn)s -- PYTHONPATH=/home/rosbuild/rpmrepo_updater/src python /home/rosbuild/rpmrepo_updater/scripts/include_folder.py %(folder_options)s --delete --invalidate -c" % locals()).split()
     call('/tmp/', cmd)
 
 
@@ -121,15 +107,10 @@ if __name__ == "__main__":
     package_version = rd.get_version(args.short_package_name, full_version=True)
     print("package name", args.short_package_name, "version", package_version)
 
-    repo_base, extension = os.path.splitext(os.path.basename(args.repo_uri))
-    repo_path = os.path.join(args.working, repo_base)
-
-    update_repo(working_dir=args.working, repo_path=repo_path, repo_uri=args.repo_uri)
-
     report_failure = False
-    for d in rd.get_target_distros()['ubuntu']:
+    for d in rd.get_target_distros()['fedora']:
 
-        tag = verify_debian_tag(repo_path, args.package_name, package_version, d)
+        tag = verify_rpm_tag(args.repo_uri, args.package_name, package_version, d)
         if not tag:
             print("No tag; bailing")
             report_failure = True
@@ -138,10 +119,10 @@ if __name__ == "__main__":
         output_dir = os.path.join(args.output, d)
         os.makedirs(output_dir)
         try:
-            build_source_deb(repo_path, tag, output_dir)
-            print("successfully created sourcedeb for tag %s on repo %s." % (tag, repo_path))
+            build_source_rpm(args.repo_uri, tag, args.package_name, fedora_ver[d], output_dir)
+            print("successfully created sourcerpm for tag %s on repo %s." % (tag, args.repo_uri))
         except CalledProcessError as ex:
-            print("Failed to build source deb for tag %s on repo %s: %s" % (tag, repo_path, ex))
+            print("Failed to build sourcerpm for tag %s on repo %s: %s" % (tag, args.repo_uri, ex))
             report_failure = True
             continue
 
@@ -150,7 +131,7 @@ if __name__ == "__main__":
         if args.noupload:
             print("Noupload argument passed, skipping upload of %s" % args.output)
         else:
-            upload_source_deb(rd.get_target_distros()['ubuntu'], args.repo_fqdn, args.repo_path,
+            upload_source_rpm(rd.get_target_distros()['fedora'], args.repo_fqdn,
                               args.output,
                               args.package_name
                               )
