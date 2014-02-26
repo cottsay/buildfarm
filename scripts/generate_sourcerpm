@@ -79,11 +79,11 @@ def upload_source_rpm(distros, repo_fqdn, input_directory, packagename):
     # Copy up the data
     for distro in distros:
         upload_source = os.path.join(input_directory, distro)
-        cmd = ("scp -r %s rosbuild@%s:%s" % (upload_source, repo_fqdn, upload_root)).split()
+        cmd = ("scp -r %s/*.src.rpm rosbuild@%s:%s/%s/SRPMS" % (upload_source, repo_fqdn, upload_root, distro)).split()
         call('/tmp/', cmd)
 
     # list all the folders where data is expected in one operation
-    folder_options = ' '.join(['-f %s' % os.path.join(upload_root, distro) for distro in distros])
+    folder_options = ' '.join(['-f %s' % os.path.join(upload_root, distro, 'SRPMS') for distro in distros])
     cmd = ("ssh rosbuild@%(repo_fqdn)s -- PYTHONPATH=/home/rosbuild/rpmrepo_updater/src python /home/rosbuild/rpmrepo_updater/scripts/include_folder.py %(folder_options)s --delete --invalidate -c" % locals()).split()
     call('/tmp/', cmd)
 

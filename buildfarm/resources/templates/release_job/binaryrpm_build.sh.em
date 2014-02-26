@@ -44,7 +44,7 @@ echo "package name ${PACKAGE} version ${VERSION}"
 /usr/bin/mock --quiet --configdir $MOCK_CONF_DIR --root fedora-$DISTRO_VER-$ARCH-ros --resultdir $WORKSPACE/output --rebuild $WORKSPACE/workspace/*.src.rpm
 
 # Upload invalidate and add to the repo
-UPLOAD_DIR=/tmp/upload/$PACKAGE_$DISTRO_$ARCH
+UPLOAD_DIR=/tmp/upload/$PACKAGE/$DISTRO/$ARCH
 
 # Remove the source RPM (that's already in the repo)
 rm -f $WORKSPACE/output/*.src.rpm
