@@ -18,12 +18,18 @@ def parse_options():
                         help='Enable to use a ramdisk for builds. Default: %(default)s')
     parser.add_argument('--quiet', default=False, action='store_true',
                         help='Enable to suppress output. Default: %(default)s')
+    parser.add_argument('--get-default-output-dir', default=False, action='store_true',
+                        help='Prints the default output directory and exits.')
     args = parser.parse_args()
 
     return args
 
 if __name__ == "__main__":
     args = parse_options()
+
+    if args.get_default_output_dir:
+        print(get_default_confdir())
+        sys.exit(0)
 
     if not args.distro:
         print("Invalid Fedora distribution: %s" % args.distro)
