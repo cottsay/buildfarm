@@ -59,7 +59,7 @@ def parse_options():
 
 def verify_heads(repo_uri, expected_head):
     expected_head = 'refs/heads/' + expected_head
-    process = Popen(['git', 'ls-remote', '--heads', repo_uri], stdout=PIPE, stderr=PIPE)
+    process = Popen(['git', 'ls-remote', '--heads', repo_uri, expected_head], stdout=PIPE, stderr=PIPE)
     heads = process.communicate()[0]
     if not process.poll() == 0:
         tags = ""
@@ -111,7 +111,7 @@ def doit(rd, distros, arches, target_repository, fqdn, jobs_graph, rosdistro, pa
         # TODO: Workaround until repos have rpm branches
         if platform == 'fedora':
             expected_branch = 'rpm/' + rosdistro + '/*'
-            if not verify_heads(r.url, expected_branch):
+            if not verify_heads(r.url, expected_branch)
                 temporary_url = '://github.com/smd-ros-rpm-release/%s-release.git' % r.name
                 if verify_heads('git' + temporary_url, expected_branch):
                     r.url = 'https' + temporary_url
