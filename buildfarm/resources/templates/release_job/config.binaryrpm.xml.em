@@ -194,6 +194,8 @@ if (manager.logContains(".*W: Failed to fetch .* Hash Sum mismatch.*")) {
 	reschedule_build("apt repo could not be resolved")
 } else if (manager.logContains(".*Some index files failed to download.*")) {
 	reschedule_build("apt index file could not be downloaded")
+} else if (manager.logContains("Cannot find a valid baseurl for repo")) {
+	reschedule_build("Yum repo baseurl could not be found")
 }
 </groovyScript>
       <behavior>0</behavior>
