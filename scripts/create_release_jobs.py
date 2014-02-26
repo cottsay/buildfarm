@@ -238,6 +238,12 @@ if __name__ == '__main__':
         if args.arches is None:
             args.arches = rd.get_arches()
 
+        # TODO Fedora Arch Workaround
+        if 'amd64' in args.arches:
+            args.arches.remove('amd64')
+            args.arches.append('x86_64',)
+        # End Workaround
+
         # TODO does only work with one build file
         sourcepkg_timeout = rd._build_files[0].jenkins_sourcedeb_job_timeout
         binarypkg_timeout = rd._build_files[0].jenkins_binarydeb_job_timeout

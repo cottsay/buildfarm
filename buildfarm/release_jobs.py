@@ -29,7 +29,9 @@ class Templates(object):
     command_sourcedeb = pkg_resources.resource_string('buildfarm', 'resources/templates/release_job/source_build.sh.em')  # The bash script that the sourcedebs config.xml runs.
     command_sourcerpm = pkg_resources.resource_string('buildfarm', 'resources/templates/release_job/sourcerpm_build.sh.em')  # The bash script that the sourcerpms config.xml runs.
     command_binarydeb = pkg_resources.resource_string('buildfarm', 'resources/templates/release_job/binary_build.sh.em')  # builds binary debs.
+    command_binaryrpm = pkg_resources.resource_string('buildfarm', 'resources/templates/release_job/binaryrpm_build.sh.em')  # builds binary rpms.
     config_binarydeb = pkg_resources.resource_string('buildfarm', 'resources/templates/release_job/config.binary.xml.em')  # A config.xml template for something that runs a shell script
+    config_binaryrpm = pkg_resources.resource_string('buildfarm', 'resources/templates/release_job/config.binaryrpm.xml.em')  # A config.xml template for something that runs a shell script
     config_dry_binarydeb = pkg_resources.resource_string('buildfarm', 'resources/templates/dry_release/config.xml.em')  # A config.xml template for something that runs a shell script
     config_sync_binarydeb = pkg_resources.resource_string('buildfarm', 'resources/templates/dry_release/sync_config.xml.em')  # A config.xml template for something that runs a shell script
     command_dry_binarydeb = pkg_resources.resource_string('buildfarm', 'resources/templates/dry_release/build.sh.em')  # A config.xml template for something that runs a shell script
@@ -294,6 +296,13 @@ def create_binarydeb_config(d):
     return expand(Templates.config_binarydeb, d)
 
 
+def create_binaryrpm_config(d):
+    d['TIMESTAMP'] = datetime.datetime.now()
+    d['DISTRO_VER'] = fedora_ver[d['DISTRO']]
+    d['COMMAND'] = escape(expand(Templates.command_binaryrpm, d))
+    return expand(Templates.config_binaryrpm, d)
+
+
 def create_dry_binarydeb_config(d):
     d['COMMAND'] = escape(expand(Templates.command_dry_binarydeb, d))
     d['TIMESTAMP'] = datetime.datetime.now()
@@ -314,12 +323,15 @@ def binaryrpm_job_name(packagename, distro, arch):
     return "%(packagename)s_binaryrpm_%(distro)s_%(arch)s" % locals()
 
 
-def calc_child_jobs(packagename, distro, arch, jobgraph):
+def calc_child_jobs(packagename, distro, arch, jobgraph, platform='ubuntu'):
     children = []
     if jobgraph:
         for package, deps in jobgraph.iteritems():
             if packagename in deps:
-                children.append(binarydeb_job_name(package, distro, arch))
+                if platform == 'fedora':
+                    children.append(binaryrpm_job_name(package, distro, arch))
+                else:
+                    children.append(binarydeb_job_name(package, distro, arch))
     return children
 
 
@@ -372,7 +384,7 @@ def binarypkg_jobs(package, maintainer_emails, distros, arches, target_repositor
     d = dict(
         ROSDISTRO_INDEX_URL=get_index_url(),
         DISTROS=distros,
-        APT_TARGET_REPOSITORY=target_repository,
+        TARGET_REPOSITORY=target_repository,
         FQDN=fqdn,
         PACKAGE=package,
         NOTIFICATION_EMAIL=' '.join(maintainer_emails),
@@ -381,13 +393,12 @@ def binarypkg_jobs(package, maintainer_emails, distros, arches, target_repositor
         SSH_KEY_ID=ssh_key_id
     )
     jobs = []
-    return jobs # TODO XXX
     first_matrix_job = True
     for distro in distros:
         for arch in arches:
             d['ARCH'] = arch
             d['DISTRO'] = distro
-            d["CHILD_PROJECTS"] = calc_child_jobs(package, distro, arch, jobgraph)
+            d["CHILD_PROJECTS"] = calc_child_jobs(package, distro, arch, jobgraph, platform)
             d["DEPENDENTS"] = add_dependent_to_dict(package, jobgraph)
             if first_matrix_job:
                 # build first distro/arch before others
@@ -395,9 +406,13 @@ def binarypkg_jobs(package, maintainer_emails, distros, arches, target_repositor
                 first_matrix_job = False
             else:
                 d['PRIORITY'] = 900
-            config = create_binarydeb_config(d)
-            #print(config)
-            job_name = binarydeb_job_name(package, distro, arch)
+            if platform == 'fedora':
+                config = create_binaryrpm_config(d)
+                job_name = binaryrpm_job_name(package, distro, arch)
+            else:
+                config = create_binarydeb_config(d)
+                #print(config)
+                job_name = binarydeb_job_name(package, distro, arch)
             jobs.append((job_name, config))
     return jobs
 
