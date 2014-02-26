@@ -70,20 +70,23 @@ def build_source_rpm(repo_uri, tag, packagename, distro, output):
 def upload_source_rpm(distros, repo_fqdn, input_directory, packagename):
     upload_root = "/tmp/upload/%s" % packagename
 
-    # clear the upload directory to make sure that there are not old files lying around
-    cmd = ("ssh rosbuild@%s -- rm -rf %s" % (repo_fqdn, upload_root)).split()
-    call('/tmp/', cmd)
-    cmd = ("ssh rosbuild@%s -- mkdir -p %s" % (repo_fqdn, upload_root)).split()
-    call('/tmp/', cmd)
+    upload_root_list = []
 
     # Copy up the data
     for distro in distros:
-        upload_source = os.path.join(input_directory, distro)
-        cmd = ("scp -r %s/*.src.rpm rosbuild@%s:%s/%s/SRPMS" % (upload_source, repo_fqdn, upload_root, distro)).split()
+        upload_source = os.path.join(input_directory, distro, 'SRPMS')
+        distro_upload_root = os.path.join(upload_root, distro, 'SRPMS')
+        # clear the upload directory to make sure that there are not old files lying around
+        cmd = ("ssh rosbuild@%s -- rm -rf %s" % (repo_fqdn, distro_upload_root)).split()
         call('/tmp/', cmd)
+        cmd = ("ssh rosbuild@%s -- mkdir -p %s" % (repo_fqdn, distro_upload_root)).split()
+        call('/tmp/', cmd)
+        cmd = ("scp -r %s rosbuild@%s:%s" % (upload_source, repo_fqdn, distro_upload_root)).split()
+        call('/tmp/', cmd)
+        upload_root_list += distro_upload_root
 
     # list all the folders where data is expected in one operation
-    folder_options = ' '.join(['-f %s' % os.path.join(upload_root, distro, 'SRPMS') for distro in distros])
+    folder_options = ' '.join(['-f %s' % upload_root_list for root in upload_root_list])
     cmd = ("ssh rosbuild@%(repo_fqdn)s -- PYTHONPATH=/home/rosbuild/rpmrepo_updater/src python /home/rosbuild/rpmrepo_updater/scripts/include_folder.py %(folder_options)s --delete --invalidate -c" % locals()).split()
     call('/tmp/', cmd)
 
@@ -119,7 +122,7 @@ if __name__ == "__main__":
             report_failure = True
             continue
 
-        output_dir = os.path.join(args.output, d)
+        output_dir = os.path.join(args.output, d, 'SRPMS')
         os.makedirs(output_dir)
         try:
             build_source_rpm(args.repo_uri, tag, args.package_name, d, output_dir)
