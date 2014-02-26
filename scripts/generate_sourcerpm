@@ -76,7 +76,7 @@ def upload_source_rpm(distros, repo_fqdn, input_directory, packagename):
     for distro in distros:
         upload_source = os.path.join(input_directory, distro, 'SRPMS')
         distro_upload_root = os.path.join(upload_root, distro)
-        da_upload_root = os.path.join(da_upload_root, 'SRPMS')
+        da_upload_root = os.path.join(distro_upload_root, 'SRPMS')
         # clear the upload directory to make sure that there are not old files lying around
         cmd = ("ssh rosbuild@%s -- rm -rf %s" % (repo_fqdn, da_upload_root)).split()
         call('/tmp/', cmd)
