@@ -83,7 +83,7 @@ def upload_source_rpm(distros, repo_fqdn, input_directory, packagename):
         call('/tmp/', cmd)
         cmd = ("scp -r %s rosbuild@%s:%s" % (upload_source, repo_fqdn, distro_upload_root)).split()
         call('/tmp/', cmd)
-        upload_root_list += distro_upload_root
+        upload_root_list += [distro_upload_root]
 
     # list all the folders where data is expected in one operation
     folder_options = ' '.join(['-f %s' % upload_root_list for root in upload_root_list])
