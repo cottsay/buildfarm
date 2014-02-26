@@ -3,14 +3,12 @@
 import os
 from platform import machine
 import sys
-from buildfarm.mock_root import check_mock_config
-
-default_output_dir = os.path.join(os.path.expanduser('~'), '.mock_config')
+from buildfarm.mock_root import check_mock_config, get_default_confdir
 
 def parse_options():
     import argparse
     parser = argparse.ArgumentParser(description='Verifies and if necessary, creates mock configuration')
-    parser.add_argument('--output-dir', default=default_output_dir,
+    parser.add_argument('--output-dir', default=get_default_confdir(),
                         help='Location to store mock config(s). Default: %(default)s')
     parser.add_argument('--arch', default=machine(),
                         help='Target architecture (i386, x86_64, srpm). Default: %(default)s')

@@ -1,6 +1,6 @@
-@(rpmfusion_free_cfg)
+@(base_cfg)
 
-config_opts['root'] += '-ros'
+config_opts['root'] += '-@(suffix)'
 
 config_opts['plugin_conf']['tmpfs_enable'] = @[if use_ramdisk]True@[else]False@[end if]
 config_opts['plugin_conf']['tmpfs_opts']['required_ram_mb'] = 4096

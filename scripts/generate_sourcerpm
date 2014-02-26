@@ -2,7 +2,9 @@
 
 from __future__ import print_function
 from buildfarm.fedora_vmap import fedora_ver
+from buildfarm.mock_root import check_mock_config, get_default_confdir
 import os
+from platform import machine
 import subprocess
 from subprocess import Popen, CalledProcessError
 import sys
@@ -58,8 +60,9 @@ def verify_rpm_tag(repo_uri, package_name, package_version, distro):
     return None
 
 
-def build_source_rpm(repo_uri, tag, packagename, fedora_ver, output):
-    call(None, ('mock', '--quiet', '-D', 'fedora ' + str(fedora_ver), '-D', 'dist .fc' + str(fedora_ver), '--buildsrpm', '--resultdir', output, '--scm-enable', '--scm-option', 'git_get=git clone ' + repo_uri + ' ' + packagename, '--scm-option', 'package=' + packagename, '--scm-option', 'branch=' + tag, '--scm-option', 'write_tar=True', '--scm-option', 'spec=rpm/' + packagename + '.spec'))
+def build_source_rpm(repo_uri, tag, packagename, distro, output):
+    check_mock_config(distro, 'src', True, True, get_default_confdir(), [])
+    call(None, ('mock', '--quiet', '--configdir', get_default_confdir(), '--root',  'fedora-' + str(fedora_ver[distro]) + '-' + machine() + '-rossrc', '--buildsrpm', '--resultdir', output, '--scm-enable', '--scm-option', 'git_get=git clone ' + repo_uri + ' ' + packagename, '--scm-option', 'package=' + packagename, '--scm-option', 'branch=' + tag, '--scm-option', 'write_tar=True', '--scm-option', 'spec=rpm/' + packagename + '.spec'))
     print("Successfully created changes in %s" % output)
     call(None, ['ls', output])
 
@@ -119,7 +122,7 @@ if __name__ == "__main__":
         output_dir = os.path.join(args.output, d)
         os.makedirs(output_dir)
         try:
-            build_source_rpm(args.repo_uri, tag, args.package_name, fedora_ver[d], output_dir)
+            build_source_rpm(args.repo_uri, tag, args.package_name, d, output_dir)
             print("successfully created sourcerpm for tag %s on repo %s." % (tag, args.repo_uri))
         except CalledProcessError as ex:
             print("Failed to build sourcerpm for tag %s on repo %s: %s" % (tag, args.repo_uri, ex))
