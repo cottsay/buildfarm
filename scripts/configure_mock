@@ -1,0 +1,34 @@
+#!/usr/bin/env python
+
+import os
+from platform import machine
+import sys
+from buildfarm.mock_root import check_mock_config
+
+default_output_dir = os.path.join(os.path.expanduser('~'), '.mock_config')
+
+def parse_options():
+    import argparse
+    parser = argparse.ArgumentParser(description='Verifies and if necessary, creates mock configuration')
+    parser.add_argument('--output-dir', default=default_output_dir,
+                        help='Location to store mock config(s). Default: %(default)s')
+    parser.add_argument('--arch', default=machine(),
+                        help='Target architecture (i386, x86_64, srpm). Default: %(default)s')
+    parser.add_argument('distro',
+                        help='Distribution to configure (heisenbug, etc).')
+    parser.add_argument('--use-ramdisk', default=False, action='store_true',
+                        help='Enable to use a ramdisk for builds. Default: %(default)s')
+    parser.add_argument('--quiet', default=False, action='store_true',
+                        help='Enable to suppress output. Default: %(default)s')
+    args = parser.parse_args()
+
+    return args
+
+if __name__ == "__main__":
+    args = parse_options()
+
+    if not args.distro:
+        print("Invalid Fedora distribution: %s" % args.distro)
+        sys.exit(1)
+
+    check_mock_config(args.distro, args.arch, args.use_ramdisk, args.quiet, args.output_dir)
