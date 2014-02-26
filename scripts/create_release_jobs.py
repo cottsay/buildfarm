@@ -69,11 +69,11 @@ def verify_heads(repo_uri, expected_head):
         if head != '':
             head_list += [head.split()[-1]]
 
-    if expected_head in head_list:
-        return expected_head
+    #if expected_head in head_list:
+    #    return expected_head
     #else:
     #    print("No matching head found. Are you sure you pointed to the right repository or the version is right?, expected %s:\nHeads:\n%s" % (expected_head, heads))
-    return None
+    return head_list or None
 
 
 def doit(rd, distros, arches, target_repository, fqdn, jobs_graph, rosdistro, packages, dry_maintainers, commit=False, delete_extra_jobs=False, whitelist_repos=None, sourcepkg_timeout=None, binarypkg_timeout=None, ssh_key_id=None, platform='ubuntu'):
@@ -110,7 +110,7 @@ def doit(rd, distros, arches, target_repository, fqdn, jobs_graph, rosdistro, pa
 
         # TODO: Workaround until repos have rpm branches
         if platform == 'fedora':
-            expected_branch = 'rpm/' + rosdistro + '/' + r.name
+            expected_branch = 'rpm/' + rosdistro + '/*'
             if not verify_heads(r.url, expected_branch):
                 temporary_url = '://github.com/smd-ros-rpm-release/%s-release.git' % r.name
                 if verify_heads('git' + temporary_url, expected_branch):
