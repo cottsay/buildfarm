@@ -24,13 +24,13 @@ mkdir -p $WORKSPACE/workspace
 # Check and update mock config
 mount | grep -q mock_chroot_tmpfs && sudo umount mock_chroot_tmpfs || echo "mock_chroot_tmpfs is not mounted! hooray!"
 MOCK_CONF_DIR=`$WORKSPACE/monitored_vcs/scripts/configure_mock heisenbug --get-default-output-dir`
-$WORKSPACE/monitored_vcs/scripts/configure_mock @(DISTRO) --arch @(ARCH)
+$WORKSPACE/monitored_vcs/scripts/configure_mock @(DISTRO) --arch @(ARCH) --use-ramdisk
 /usr/bin/mock --quiet --configdir $MOCK_CONF_DIR --root fedora-$DISTRO_VER-$ARCH-ros --resultdir $WORKSPACE/output --scrub=yum-cache
 /usr/bin/mock --quiet --configdir $MOCK_CONF_DIR --root fedora-$DISTRO_VER-$ARCH-ros --resultdir $WORKSPACE/output --init
 /usr/bin/mock --quiet --configdir $MOCK_CONF_DIR --root fedora-$DISTRO_VER-$ARCH-ros --resultdir $WORKSPACE/output --copyout /etc/yum.conf $WORKSPACE/workspace/
 
 # I think this might be a mock bug...but things don't get umounted after the copyout
-#sudo umount mock_chroot_tmpfs || echo "Unmount failed...this is OK"
+sudo umount mock_chroot_tmpfs || echo "Unmount failed...this is OK"
 
 # Pull the sourcerpm
 yum --quiet clean headers packages metadata dbcache plugins expire-cache
