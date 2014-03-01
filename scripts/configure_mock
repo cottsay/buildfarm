@@ -20,6 +20,8 @@ def parse_options():
                         help='Enable to suppress output. Default: %(default)s')
     parser.add_argument('--get-default-output-dir', default=False, action='store_true',
                         help='Prints the default output directory and exits.')
+    parser.add_argument('--base', default=None,
+                        help='Name of or path to the base mock configuration.')
     args = parser.parse_args()
 
     return args
@@ -35,4 +37,4 @@ if __name__ == "__main__":
         print("Invalid Fedora distribution: %s" % args.distro)
         sys.exit(1)
 
-    check_mock_config(args.distro, args.arch, args.use_ramdisk, args.quiet, args.output_dir)
+    check_mock_config(args.distro, args.arch, args.use_ramdisk, args.quiet, args.output_dir, base=args.base)

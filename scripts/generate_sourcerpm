@@ -21,6 +21,7 @@ def parse_options():
     parser.add_argument('--output', help='The result of source deb building will go here. Default: %(default)s', default='/tmp/catkin_rpms')
     parser.add_argument('--repo-fqdn', dest='repo_fqdn', help='The fully qualified domain name of the repo machine. Default: %(default)s', default='csc.mcs.sdsmt.edu')
     parser.add_argument('--repo-path', dest='repo_path', help='The path to find the repo on the machine. Default: %(default)s', default='/mnt/storage/repos/smd-ros-building')
+    parser.add_argument('--base-mock-cfg', help='Path to or name of the base mock config for sourcerpm build environment.', default=None)
     parser.add_argument('-n', dest='noupload', help='Do not try to upload', action='store_true', default=False)
 
     args = parser.parse_args()
@@ -60,8 +61,8 @@ def verify_rpm_tag(repo_uri, package_name, package_version, distro):
     return None
 
 
-def build_source_rpm(repo_uri, tag, packagename, distro, output):
-    check_mock_config(distro, 'src', True, True, get_default_confdir(), [])
+def build_source_rpm(repo_uri, tag, packagename, distro, output, base_mock_cfg):
+    check_mock_config(distro, 'src', True, True, get_default_confdir(), [], base=base_mock_cfg)
     call(None, ('mock', '--quiet', '--configdir', get_default_confdir(), '--root',  'fedora-' + str(fedora_ver[distro]) + '-' + machine() + '-rossrc', '--buildsrpm', '--resultdir', output, '--scm-enable', '--scm-option', 'git_get=git clone ' + repo_uri + ' ' + packagename, '--scm-option', 'package=' + packagename, '--scm-option', 'branch=' + tag, '--scm-option', 'write_tar=True', '--scm-option', 'spec=rpm/' + packagename + '.spec'))
     print("Successfully created changes in %s" % output)
     call(None, ['ls', output])
@@ -126,7 +127,7 @@ if __name__ == "__main__":
         output_dir = os.path.join(args.output, d, 'SRPMS')
         os.makedirs(output_dir)
         try:
-            build_source_rpm(args.repo_uri, tag, args.package_name, d, output_dir)
+            build_source_rpm(args.repo_uri, tag, args.package_name, d, output_dir, args.base_mock_cfg)
             print("successfully created sourcerpm for tag %s on repo %s." % (tag, args.repo_uri))
         except CalledProcessError as ex:
             print("Failed to build sourcerpm for tag %s on repo %s: %s" % (tag, args.repo_uri, ex))

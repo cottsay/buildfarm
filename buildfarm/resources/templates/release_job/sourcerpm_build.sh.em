@@ -13,7 +13,7 @@ cd $WORKSPACE/monitored_vcs
 rm -rf $WORKSPACE/output
 rm -rf $WORKSPACE/workspace
 
-$WORKSPACE/monitored_vcs/scripts/generate_sourcerpm $RELEASE_URI $PACKAGE $ROSDISTRO $SHORT_PACKAGE_NAME --working $WORKSPACE/workspace --output $WORKSPACE/output --repo-fqdn $FQDN || RET=$?
+$WORKSPACE/monitored_vcs/scripts/generate_sourcerpm $RELEASE_URI $PACKAGE $ROSDISTRO $SHORT_PACKAGE_NAME --working $WORKSPACE/workspace --output $WORKSPACE/output --repo-fqdn $FQDN --base-mock-cfg fedora-%\(distro\)s-%\(arch\)s-local.cfg || RET=$?
 
 # clean up the workspace to save disk space
 rm -rf $WORKSPACE/workspace

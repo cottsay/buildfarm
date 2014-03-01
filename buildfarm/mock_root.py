@@ -17,7 +17,7 @@ repos = {
 def get_default_confdir():
     return os.path.join(os.path.expanduser('~'), '.mock_config')
 
-def check_mock_config(distro, arch=machine(), use_ramdisk=True, quiet=False, output_dir=get_default_confdir(), repos=repos):
+def check_mock_config(distro, arch=machine(), use_ramdisk=True, quiet=False, output_dir=get_default_confdir(), repos=repos, base=None):
     # General Stuff
     distro = fedora_ver[distro]
     mock_dir = os.path.normpath('/etc/mock')
@@ -31,13 +31,18 @@ def check_mock_config(distro, arch=machine(), use_ramdisk=True, quiet=False, out
     if arch in ['srpm', 'src', 'source']:
         arch = machine()
         suffix = 'rossrc'
-        with open(os.path.join(mock_dir, 'fedora-%s-%s.cfg' % (distro, arch)), 'r') as f:
-            base_cfg = f.read()
+        if not base:
+            base = 'fedora-%(distro)s-%(arch)s.cfg'
     else:
         suffix = 'ros'
-        with open(os.path.join(mock_dir, 'fedora-%s-%s-rpmfusion_free.cfg' % (distro, arch)), 'r') as f:
-            base_cfg = f.read()
-
+        if not base:
+            base = 'fedora-%(distro)s-%(arch)s-rpmfusion_free.cfg'
+    base = base % {'distro':distro, 'arch':arch}
+    if not base.startswith('/'):
+        base = os.path.join(mock_dir, base);
+    print('Opening ' + base)
+    with open(base, 'r') as f:
+        base_cfg = f.read()
 
     mock_template = resource_string('buildfarm', 'resources/templates/mock.cfg.em')
     arch_config = em.expand(mock_template, **locals())
