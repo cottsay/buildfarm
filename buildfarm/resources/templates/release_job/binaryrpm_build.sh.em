@@ -44,7 +44,7 @@ echo "package name ${PACKAGE} version ${VERSION}"
 # Actually perform the mockbuild
 /usr/bin/mock --quiet --configdir $MOCK_CONF_DIR --root fedora-$DISTRO_VER-$ARCH-ros --resultdir $WORKSPACE/output --rebuild $WORKSPACE/workspace/*.src.rpm || RET=$?
 
-if [ $RET -ne 0]; then
+if [ $RET -ne 0 ]; then
   echo "Last 20 lines of build log:"
   tail -n 20 $WORKSPACE/output/build.log
   exit $RET
