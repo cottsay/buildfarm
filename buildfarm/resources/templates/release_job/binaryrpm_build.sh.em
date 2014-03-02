@@ -6,6 +6,7 @@ PACKAGE=@(PACKAGE)
 DISTRO=@(DISTRO)
 DISTRO_VER=@(DISTRO_VER)
 ARCH=@(ARCH)
+RET=0
 
 cd $WORKSPACE/monitored_vcs
 . setup.sh
@@ -41,7 +42,16 @@ VERSION=`rpm --queryformat="%{VERSION}" -qp $WORKSPACE/workspace/*.src.rpm`
 echo "package name ${PACKAGE} version ${VERSION}"
 
 # Actually perform the mockbuild
-/usr/bin/mock --quiet --configdir $MOCK_CONF_DIR --root fedora-$DISTRO_VER-$ARCH-ros --resultdir $WORKSPACE/output --rebuild $WORKSPACE/workspace/*.src.rpm
+/usr/bin/mock --quiet --configdir $MOCK_CONF_DIR --root fedora-$DISTRO_VER-$ARCH-ros --resultdir $WORKSPACE/output --rebuild $WORKSPACE/workspace/*.src.rpm || RET=$?
+
+if [ $RET -ne 0]; then
+  echo "Last 20 lines of build log:"
+  tail -n 20 $WORKSPACE/output/build.log
+  exit $RET
+else
+  echo -n "Build finished: "
+  date
+fi
 
 # Upload invalidate and add to the repo
 UPLOAD_DIR=/tmp/upload/$PACKAGE/$DISTRO/$ARCH
@@ -56,6 +66,9 @@ ssh rosbuild@@$ROS_REPO_FQDN -- PYTHONPATH=/home/rosbuild/rpmrepo_updater/src py
 
 # check that the uploaded successfully
 #sudo $CHECKOUT_DIR/scripts/assert_package_present.py $rootdir $aptconffile  $PACKAGE
+
+echo -n "Upload finished: "
+date
 
 # clean up work_dir to save space on the slaves
 rm -rf $WORKSPACE/output
