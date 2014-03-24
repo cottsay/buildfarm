@@ -38,7 +38,7 @@ yum --quiet clean headers packages metadata dbcache plugins expire-cache
 yumdownloader --quiet --disablerepo="*" --enablerepo=building --source --config $WORKSPACE/workspace/yum.conf --destdir $WORKSPACE/workspace $PACKAGE
 
 # extract version number from the dsc file
-VERSION=`rpm --queryformat="%{VERSION}" -qp $WORKSPACE/workspace/*.src.rpm`
+VERSION=`rpm --queryformat="%{VERSION}-%{RELEASE}" -qp $WORKSPACE/workspace/*.src.rpm | sed 's/\.fc[0-9][0-9]*//'`
 echo "package name ${PACKAGE} version ${VERSION}"
 
 # Actually perform the mockbuild
