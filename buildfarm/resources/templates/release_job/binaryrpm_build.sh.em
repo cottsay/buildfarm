@@ -8,6 +8,18 @@ DISTRO_VER=@(DISTRO_VER)
 ARCH=@(ARCH)
 RET=0
 
+# When mock uses tmpfs for builds, it sometimes doesn't dismount properly.
+# There are other scenarios where dismounting doesn't happen, such as an
+# aborted build. This will ensure that the tmpfs isn't mounted.
+check_umount_mock_root ()
+{
+MOCK_ROOT=$(/usr/bin/mock --quiet --configdir $MOCK_CONF_DIR --root fedora-$DISTRO_VER-$ARCH-ros --print-root-path | sed 's/\/root\///')
+CMOUNTS=$(mount | awk '{ print $3 }' | grep ^$MOCK_ROOT | tr "\n" " " || echo '')
+if [ "$CMOUNTS" != "" ]; then
+	sudo umount $CMOUNTS || echo "WARNING: umount failed"
+fi
+}
+
 cd $WORKSPACE/monitored_vcs
 . setup.sh
 
@@ -23,15 +35,12 @@ mkdir -p $WORKSPACE/output
 mkdir -p $WORKSPACE/workspace
 
 # Check and update mock config
-mount | grep -q mock_chroot_tmpfs && sudo umount mock_chroot_tmpfs || echo "mock_chroot_tmpfs is not mounted! hooray!"
 MOCK_CONF_DIR=`$WORKSPACE/monitored_vcs/scripts/configure_mock heisenbug --get-default-output-dir`
 $WORKSPACE/monitored_vcs/scripts/configure_mock @(DISTRO) --arch @(ARCH) --use-ramdisk --base fedora-%\(distro\)s-%\(arch\)s-rpmfusion_free-local.cfg
 /usr/bin/mock --quiet --configdir $MOCK_CONF_DIR --root fedora-$DISTRO_VER-$ARCH-ros --resultdir $WORKSPACE/output --scrub=yum-cache
+check_umount_mock_root
 /usr/bin/mock --quiet --configdir $MOCK_CONF_DIR --root fedora-$DISTRO_VER-$ARCH-ros --resultdir $WORKSPACE/output --init
 /usr/bin/mock --quiet --configdir $MOCK_CONF_DIR --root fedora-$DISTRO_VER-$ARCH-ros --resultdir $WORKSPACE/output --copyout /etc/yum.conf $WORKSPACE/workspace/
-
-# I think this might be a mock bug...but things don't get umounted after the copyout
-sudo umount mock_chroot_tmpfs || echo "Unmount failed...this is OK"
 
 # Pull the sourcerpm
 yum --quiet clean headers packages metadata dbcache plugins expire-cache
@@ -42,6 +51,7 @@ VERSION=`rpm --queryformat="%{VERSION}-%{RELEASE}" -qp $WORKSPACE/workspace/*.sr
 echo "package name ${PACKAGE} version ${VERSION}"
 
 # Actually perform the mockbuild
+check_umount_mock_root
 /usr/bin/mock --quiet --configdir $MOCK_CONF_DIR --root fedora-$DISTRO_VER-$ARCH-ros --resultdir $WORKSPACE/output --rebuild $WORKSPACE/workspace/*.src.rpm || RET=$?
 
 if [ $RET -ne 0 ]; then
