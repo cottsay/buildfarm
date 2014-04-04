@@ -89,7 +89,7 @@ def upload_source_rpm(distros, repo_fqdn, input_directory, packagename):
 
     # list all the folders where data is expected in one operation
     folder_options = ' '.join(['-f %s' % root for root in upload_root_list])
-    cmd = ("ssh rosbuild@%(repo_fqdn)s -- PYTHONPATH=/home/rosbuild/rpmrepo_updater/src python /home/rosbuild/rpmrepo_updater/scripts/include_folder.py %(folder_options)s --delete --invalidate -c" % locals()).split()
+    cmd = ("ssh rosbuild@%(repo_fqdn)s -- PYTHONPATH=/home/rosbuild/rpmrepo_updater/src python /home/rosbuild/rpmrepo_updater/scripts/update_trigger.py %(folder_options)s --delete" % locals()).split()
     call('/tmp/', cmd)
 
 

@@ -72,7 +72,7 @@ rm -f $WORKSPACE/output/*.src.rpm
 ssh rosbuild@@$ROS_REPO_FQDN -- mkdir -p $UPLOAD_DIR
 ssh rosbuild@@$ROS_REPO_FQDN -- rm -rf $UPLOAD_DIR/*
 scp -r $WORKSPACE/output/*fc$DISTRO_VER*rpm rosbuild@@$ROS_REPO_FQDN:$UPLOAD_DIR
-ssh rosbuild@@$ROS_REPO_FQDN -- PYTHONPATH=/home/rosbuild/rpmrepo_updater/src python /home/rosbuild/rpmrepo_updater/scripts/include_folder.py -f $UPLOAD_DIR --delete --invalidate -c
+ssh rosbuild@@$ROS_REPO_FQDN -- PYTHONPATH=/home/rosbuild/rpmrepo_updater/src python /home/rosbuild/rpmrepo_updater/scripts/update_trigger.py -f $UPLOAD_DIR --delete
 
 # check that the uploaded successfully
 #sudo $CHECKOUT_DIR/scripts/assert_package_present.py $rootdir $aptconffile  $PACKAGE
