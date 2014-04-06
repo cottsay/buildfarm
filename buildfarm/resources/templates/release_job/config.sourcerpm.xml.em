@@ -9,15 +9,6 @@
     <artifactNumToKeep>-1</artifactNumToKeep>
   </logRotator>
   <keepDependencies>false</keepDependencies>
-  <properties>
-    <hudson.plugins.throttleconcurrents.ThrottleJobProperty plugin="throttle-concurrents@@1.8.2">
-      <categories>
-        <string>rpmbuild-SRPMS</string>
-      </categories>
-      <throttleEnabled>true</throttleEnabled>
-      <throttleOption>category</throttleOption>
-    </hudson.plugins.throttleconcurrents.ThrottleJobProperty>
-  </properties>
   <scm class="hudson.plugins.git.GitSCM" plugin="git@@1.3.0">
     <configVersion>2</configVersion>
     <userRemoteConfigs>
@@ -55,7 +46,7 @@
     <includedRegions/>
     <scmName/>
   </scm>
-  <assignedNode>rpmbuild</assignedNode>
+  <assignedNode>rpmbuild-SRPMS</assignedNode>
   <canRoam>false</canRoam>
   <disabled>false</disabled>
   <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
