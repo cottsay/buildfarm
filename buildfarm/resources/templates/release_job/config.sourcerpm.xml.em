@@ -144,6 +144,8 @@ def reschedule_build(msg) {
 
 if (manager.logContains(".*hudson.plugins.git.GitException: Could not clone.*")) {
   reschedule_build("Could not clone")
+} else if (manager.logContains(".*OSError: [Errno 16] Device or resource busy:.*")) {
+	reschedule_build("Build root was already in use")
 }
 </groovyScript>
       <behavior>0</behavior>

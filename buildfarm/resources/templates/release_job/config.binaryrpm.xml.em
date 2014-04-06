@@ -246,6 +246,8 @@ if (manager.logContains(".*hudson.plugins.git.GitException: Could not clone.*"))
 	reschedule_build("Yum failed to find an appropriate package mirror")
 } else if (manager.logContains(".*Cannot find a valid baseurl for repo.*")) {
 	reschedule_build("Yum repo baseurl could not be found")
+} else if (manager.logContains(".*OSError: [Errno 16] Device or resource busy:.*")) {
+	reschedule_build("Build root was already in use")
 }
 </groovyScript>
       <behavior>0</behavior>
