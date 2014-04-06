@@ -125,10 +125,8 @@ println &quot;&quot;
 println &quot;Verify that the build slot is still open&quot;
 println &quot;&quot;
 
-Node node = build.getBuiltOn()
-Computer comp = node.toComputer()
+Computer comp =build.getBuiltOn().toComputer()
 Label taskl = build.project.getAssignedLabel()
-Set&lt;LabelAtom&gt; nodel = node.getAssignedLabels()
 List&lt;Executor&gt; execs = comp == null ? new ArrayList&lt;Executor&gt;() : comp.getExecutors()
 List&lt;Task&gt; tlist = new ArrayList&lt;Task&gt;()
 for (Executor exec: execs) {
@@ -137,18 +135,14 @@ for (Executor exec: execs) {
     }
 }
 
-for (LabelAtom a : nodel) {
-    for (LabelAtom b : taskl.listAtoms()) {
-        if (a.getName().equals(b.getName())) {
-            for (Task t : tlist) {
-                for (LabelAtom c : t.getAssignedLabel().listAtoms()) {
-                    if (a.getName().equals(c.getName())) {
-                        println &quot;Re-scheduling build because the slot is already used&quot; 
-                        println &quot;&quot;
-                        build.project.scheduleBuild(new Cause.UserIdCause())
-                        throw new InterruptedException()
-                    }
-                }
+for (LabelAtom a : taskl.listAtoms()) {
+    for (Task t : tlist) {
+        for (LabelAtom b : t.getAssignedLabel().listAtoms()) {
+            if (a.getName().equals(b.getName())) {
+                println &quot;Re-scheduling build because the slot is already used&quot; 
+                println &quot;&quot;
+                build.project.scheduleBuild(new Cause.UserIdCause())
+                throw new InterruptedException()
             }
         }
     }
