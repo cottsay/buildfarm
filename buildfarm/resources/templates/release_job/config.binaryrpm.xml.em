@@ -67,7 +67,12 @@ println ""
 project = Thread.currentThread().executable.project
 
 for (upstream in project.getUpstreamProjects()) {
-	if (upstream.getNextBuildNumber() == 1) {
+	if (upstream.isBuilding()) {
+		println "Aborting build because upstream project '" + upstream.name + "' is currently building"
+		println ""
+		throw new InterruptedException()
+	}
+	if (upstream.getBuildsAsMap().size() &lt; 1) {
 		println "Aborting build because upstream project '" + upstream.name + "' has not been built yet"
 		println ""
 		throw new InterruptedException()
