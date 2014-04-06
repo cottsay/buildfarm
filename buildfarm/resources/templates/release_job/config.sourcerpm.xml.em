@@ -46,7 +46,7 @@
     <includedRegions/>
     <scmName/>
   </scm>
-  <assignedNode>rpmbuild-SRPMS</assignedNode>
+  <assignedNode>rpmbuild||rpmbuild-SRPMS</assignedNode>
   <canRoam>false</canRoam>
   <disabled>false</disabled>
   <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>

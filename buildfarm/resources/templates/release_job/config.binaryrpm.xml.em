@@ -46,7 +46,7 @@
     <includedRegions/>
     <scmName/>
   </scm>
-  <assignedNode>rpmbuild-@(ARCH)-@(DISTRO)</assignedNode>
+  <assignedNode>rpmbuild||rpmbuild-@(ARCH)-@(DISTRO)</assignedNode>
   <canRoam>false</canRoam>
   <disabled>false</disabled>
   <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
