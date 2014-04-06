@@ -71,11 +71,14 @@ import hudson.model.Queue.Task
   
 import java.util.ArrayList 
 import java.util.List
+
+import org.jenkinsci.plugins.restrict_builds_per_label.RestrictBuildsPerLabelConfig
  
 println &quot;&quot;
 println &quot;Verify that the build slot is still open&quot;
 println &quot;&quot;
 
+RestrictBuildsPerLabelConfig config = RestrictBuildsPerLabelConfig.get();
 Computer comp = build.getBuiltOn().toComputer()
 Label taskl = build.project.getAssignedLabel()
 List&lt;Executor&gt; execs = comp == null ? new ArrayList&lt;Executor&gt;() : comp.getExecutors()
@@ -87,15 +90,19 @@ for (Executor exec: execs) {
 }
 
 for (LabelAtom a : taskl.listAtoms()) {
+    int count = 1;
+    int max = config.maxConcurrentPerNode(a.getName());
     for (Task t : tlist) {
         for (LabelAtom b : t.getAssignedLabel().listAtoms()) {
-            if (a.getName().equals(b.getName())) {
-                println &quot;Re-scheduling build because the slot is already used&quot; 
-                println &quot;&quot;
-                build.project.scheduleBuild(new Cause.UserIdCause())
-                throw new InterruptedException()
-            }
+            if (a.getName().equals(b.getName()))
+                count++;
         }
+    }
+    if (max != 0 &amp;&amp; count > max) {
+        println &quot;Re-scheduling build because the slot is already used&quot; 
+        println &quot;&quot;
+        build.project.scheduleBuild(new Cause.UserIdCause())
+        throw new InterruptedException()
     }
 }
 
