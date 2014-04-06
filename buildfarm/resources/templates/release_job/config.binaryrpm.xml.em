@@ -104,64 +104,6 @@ println ""
       <bindings/>
       <classpath/>
     </hudson.plugins.groovy.SystemGroovy>
-    <hudson.plugins.groovy.SystemGroovy plugin="groovy@@1.15">
-      <scriptSource class="hudson.plugins.groovy.StringScriptSource">
-        <command>
-// VERFIY THAT WE ARE THE ONLY BUILD OF OUR TYPE
-
-import hudson.model.Result
-import hudson.model.Cause
-import hudson.model.Computer
-import hudson.model.Executor
-import hudson.model.Label
-import hudson.model.labels.LabelAtom
-import hudson.model.Node
-import hudson.model.Queue.Task
-  
-import java.util.ArrayList 
-import java.util.List
- 
-import org.jenkinsci.plugins.restrict_builds_per_label.RestrictBuildsPerLabelConfig
-
-println &quot;&quot;
-println &quot;Verify that the build slot is still open&quot;
-println &quot;&quot;
-
-RestrictBuildsPerLabelConfig config = RestrictBuildsPerLabelConfig.get();
-Computer comp = build.getBuiltOn().toComputer()
-Label taskl = build.project.getAssignedLabel()
-List&lt;Executor&gt; execs = comp == null ? new ArrayList&lt;Executor&gt;() : comp.getExecutors()
-List&lt;Task&gt; tlist = new ArrayList&lt;Task&gt;()
-for (Executor exec: execs) {
-    if (exec.getCurrentExecutable() != null &amp;&amp; exec.getCurrentExecutable().getParent() != null &amp;&amp; exec != build.getExecutor()) {
-        tlist.add(exec.getCurrentExecutable().getParent().getOwnerTask())
-    }
-}
-
-for (LabelAtom a : taskl.listAtoms()) {
-    int count = 1;
-    int max = config.maxConcurrentPerNode(a.getName());
-    for (Task t : tlist) {
-        for (LabelAtom b : t.getAssignedLabel().listAtoms()) {
-            if (a.getName().equals(b.getName()))
-                count++;
-        }
-    }
-    if (max != 0 &amp;&amp; count > max) {
-        println &quot;Re-scheduling build because the slot is already used&quot;
-        println &quot;&quot;
-        build.project.scheduleBuild(new Cause.UserIdCause())
-        throw new InterruptedException()
-    }
-}
-
-println &quot;Build slot appears to be open&quot;
-println &quot;&quot;
-</command>
-      </scriptSource>
-      <bindings></bindings>
-      <classpath></classpath>
-    </hudson.plugins.groovy.SystemGroovy>
     <hudson.tasks.Shell>
       <command>@(COMMAND)</command>
     </hudson.tasks.Shell>
