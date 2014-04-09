@@ -184,6 +184,8 @@ def reschedule_build(msg) {
 
 if (manager.logContains(".*hudson.plugins.git.GitException: Could not clone.*")) {
 	reschedule_build("Could not clone")
+} else if (manager.logContains(".*file is encrypted or is not a database.*")) {
+	reschedule_build("Yum database failure")
 } else if (manager.logContains(".*\\[Errno 16\\] error setting timestamp on file.*")) {
 	reschedule_build("Internal failure in Yum")
 } else if (manager.logContains(".*\\[Errno 256\\] No more mirrors to try.*")) {
