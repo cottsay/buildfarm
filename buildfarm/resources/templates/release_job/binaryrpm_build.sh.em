@@ -46,13 +46,16 @@ check_umount_mock_root
 yum --quiet clean headers packages metadata dbcache plugins expire-cache
 yumdownloader --quiet --disablerepo="*" --enablerepo=building --source --config $WORKSPACE/workspace/yum.conf --destdir $WORKSPACE/workspace $PACKAGE
 
-# extract version number from the dsc file
+# Extract version number from the srpm
 VERSION=`rpm --queryformat="%{VERSION}-%{RELEASE}" -qp $WORKSPACE/workspace/*.src.rpm | sed 's/\.fc[0-9][0-9]*//'`
 echo "package name ${PACKAGE} version ${VERSION}"
 
 # Actually perform the mockbuild
 check_umount_mock_root
 /usr/bin/mock --quiet --configdir $MOCK_CONF_DIR --root fedora-$DISTRO_VER-$ARCH-ros --resultdir $WORKSPACE/output --rebuild $WORKSPACE/workspace/*.src.rpm || RET=$?
+
+# Kill any lingering processes (important if we're in a tmpfs)
+/usr/bin/mock --quiet --configdir $MOCK_CONF_DIR --root fedora-$DISTRO_VER-$ARCH-ros --resultdir $WORKSPACE/output --orphanskill
 
 if [ $RET -ne 0 ]; then
   echo "Last 40 lines of build log:"
