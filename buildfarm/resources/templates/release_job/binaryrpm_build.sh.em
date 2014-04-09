@@ -57,9 +57,16 @@ check_umount_mock_root
 # Kill any lingering processes (important if we're in a tmpfs)
 /usr/bin/mock --quiet --configdir $MOCK_CONF_DIR --root fedora-$DISTRO_VER-$ARCH-ros --resultdir $WORKSPACE/output --orphanskill
 
+# Output the build log for stability testing
+echo ""
+echo "BEGIN BUILD LOG"
+echo ""
+cat $WORKSPACE/output/build.log
+echo ""
+echo "END BUILD LOG"
+echo ""
+
 if [ $RET -ne 0 ]; then
-  echo "Last 40 lines of build log:"
-  tail -n 40 $WORKSPACE/output/build.log
   exit $RET
 else
   echo -n "Build finished: "
