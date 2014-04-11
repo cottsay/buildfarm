@@ -96,6 +96,8 @@ if (manager.logContains(".*hudson.plugins.git.GitException: Could not clone.*"))
 	reschedule_build("Yum repo baseurl could not be found")
 } else if (manager.logContains(".*OSError: \\[Errno 16\\] Device or resource busy:.*")) {
 	reschedule_build("Build root was already in use")
+} else if (manager.logContains(".*\\[Errno 14\\] HTTP Error 416 - Requested Range Not Satisfiable.*")) {
+	reschedule_build("Yum failed to acquire repository metadata")
 }
 </groovyScript>
       <behavior>0</behavior>
