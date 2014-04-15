@@ -74,7 +74,7 @@ else
 fi
 
 # Upload invalidate and add to the repo
-UPLOAD_DIR=/tmp/upload/$PACKAGE/$DISTRO/$ARCH
+UPLOAD_DIR=/tmp/upload/$PACKAGE/$DISTRO_VER/$ARCH
 
 # Remove the source RPM (that's already in the repo)
 rm -f $WORKSPACE/output/*.src.rpm

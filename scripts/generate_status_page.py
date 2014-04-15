@@ -154,6 +154,7 @@ if __name__ == '__main__':
         return data
 
     def fedora_metadata_builder(column_data):
+        print("column_data: %s" % (column_data,))
         build_argstring = column_data.split('_')
         distro = build_argstring[0]
         distro_ver = fedora_ver[distro]
@@ -176,7 +177,7 @@ if __name__ == '__main__':
 
         if is_source:
             column_label = '{rosdistro_short}srcrpm{distro_short}'
-            view_name = '{rosdistro_short}srcrpm'
+            view_name = '{rosdistro_short}srcrpm{distro_short}'
         else:
             column_label = '{rosdistro_short}bin{distro_short}{arch_short}'
             view_name = '{rosdistro_short}bin{distro_short}{arch_short}'
@@ -185,7 +186,7 @@ if __name__ == '__main__':
             view_name.format(**data)
 
         if is_source:
-            job_name = 'ros-{rosdistro}-{{pkg}}_sourcerpm'
+            job_name = 'ros-{rosdistro}-{{pkg}}_sourcerpm_{distro}'
         else:
             data['arch'] = arch
             job_name = 'ros-{rosdistro}-{{pkg}}_binaryrpm_{distro}_{arch}'
