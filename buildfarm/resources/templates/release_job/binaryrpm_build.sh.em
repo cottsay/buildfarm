@@ -79,6 +79,9 @@ rm -f $WORKSPACE/output/*.src.rpm
 # Run rpmlint (for stability testing)
 rpmlint $WORKSPACE/output/*.rpm || true
 
+# Ensure package.xml is installed
+rpm -qlp $WORKSPACE/output/*.rpm | grep -q package.xml$ || echo "WARNING: package.xml not present in RPM"
+
 # Upload invalidate and add to the repo
 UPLOAD_DIR=/tmp/upload/$PACKAGE/$DISTRO_VER/$ARCH
 

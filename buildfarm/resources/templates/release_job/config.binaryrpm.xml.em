@@ -256,6 +256,8 @@ class MatchExtractor {
 warnings_group.match_extractors.add(new MatchExtractor(pattern=Pattern.compile("WARNING\\(s\\) in .*:"), next_lines=1, skip_first_line=true))
 // rpmlint error for packages that should be noarch
 //warnings_group.match_extractors.add(new MatchExtractor(pattern=Pattern.compile(".*E: empty-debuginfo-package")))
+// ensure package.xml is installed
+//warnings_group.match_extractors.add(new MatchExtractor(pattern=Pattern.compile("WARNING: package.xml not present in RPM")))
 // custom catkin deprecation messages
 deprecations_group.match_extractors.add(new MatchExtractor(pattern=Pattern.compile(".*\\) is deprecated.*")))
 // c++ compiler warning for usage of a deprecated function
