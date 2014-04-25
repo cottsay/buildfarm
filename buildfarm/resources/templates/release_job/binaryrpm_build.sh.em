@@ -73,11 +73,14 @@ else
   date
 fi
 
-# Upload invalidate and add to the repo
-UPLOAD_DIR=/tmp/upload/$PACKAGE/$DISTRO_VER/$ARCH
-
 # Remove the source RPM (that's already in the repo)
 rm -f $WORKSPACE/output/*.src.rpm
+
+# Run rpmlint (for stability testing)
+rpmlint $WORKSPACE/output/*.rpm || true
+
+# Upload invalidate and add to the repo
+UPLOAD_DIR=/tmp/upload/$PACKAGE/$DISTRO_VER/$ARCH
 
 ssh rosbuild@@$ROS_REPO_FQDN -- mkdir -p $UPLOAD_DIR
 ssh rosbuild@@$ROS_REPO_FQDN -- rm -rf $UPLOAD_DIR/*

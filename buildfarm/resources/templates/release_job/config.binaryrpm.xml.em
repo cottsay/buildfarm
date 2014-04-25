@@ -254,6 +254,8 @@ class MatchExtractor {
 // define patterns and extraction parameters
 // catkin_pkg warnings for invalid package.xml files
 warnings_group.match_extractors.add(new MatchExtractor(pattern=Pattern.compile("WARNING\\(s\\) in .*:"), next_lines=1, skip_first_line=true))
+// rpmlint error for packages that should be noarch
+//warnings_group.match_extractors.add(new MatchExtractor(pattern=Pattern.compile(".*E: empty-debuginfo-package")))
 // custom catkin deprecation messages
 deprecations_group.match_extractors.add(new MatchExtractor(pattern=Pattern.compile(".*\\) is deprecated.*")))
 // c++ compiler warning for usage of a deprecated function
