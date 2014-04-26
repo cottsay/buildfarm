@@ -10,6 +10,7 @@ import tempfile
 
 from buildfarm.ros_distro import Rosdistro
 from github.GithubException import UnknownObjectException
+from time import sleep
 
 url_re = re.compile('(http|https|git|ssh)://(git@)?github\.com[:/]([^/]*)/(.*)')
 
@@ -23,6 +24,8 @@ def parse_options():
                         help='GitHub organization to fork the repositories into. Default: smd-ros-rpm-release')
     parser.add_argument('--repos', nargs='+',
                         help='A list of repository (or stack) names to create. Default: forks all')
+    parser.add_argument('--delete-existing-workaround', action='store_true', default=False,
+                        help='Deletes the existing workaround repo and do nothing else')
 
     args = parser.parse_args()
     return args
@@ -94,12 +97,26 @@ if __name__ == '__main__':
             print('done')
 
         # Check real repo for an RPM branch in our rosdistro
-        #if verify_branch(real_repo, args.rosdistro):
+        #if verify_branch(real_repo, args.rosdistro) and not args.delete_existing_workaround:
         #    print('- already has valid release repo')
         #    continue
 
         # Check for a workaround repo
-        if real_name not in gh_org_repos:
+        if args.delete_existing_workaround:
+            if real_name in gh_org_repos:
+                sys.stdout.write('- deleting workaround repo...')
+                sys.stdout.flush()
+                try:
+                    gh_org_repos[real_name].delete()
+                    del gh_org_repos[real_name]
+                except:
+                    print('failed!')
+                else:
+                    print('done')
+            else:
+                print('- no workaround repo found')
+            continue
+        elif real_name not in gh_org_repos:
             try:
                 gh_org_repos[real_name] = gh_org.get_repo(real_name)
             except UnknownObjectException:
@@ -107,6 +124,8 @@ if __name__ == '__main__':
                 sys.stdout.write('- forking...')
                 sys.stdout.flush()
                 gh_org_repos[real_name] = gh_org.create_fork(real_repo)
+                # Cooldown
+                sleep(2.0)
                 print('done')
 
         if verify_branch(gh_org_repos[real_name], args.rosdistro):
