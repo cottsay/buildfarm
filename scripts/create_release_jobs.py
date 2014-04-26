@@ -110,9 +110,14 @@ def doit(rd, distros, arches, target_repository, fqdn, jobs_graph, rosdistro, pa
 
         # TODO: Workaround until repos have rpm branches
         if platform == 'fedora':
+            import re
             expected_branch = 'rpm/' + rosdistro + '/*'
             if not verify_heads(r.url, expected_branch):
-                temporary_url = '://github.com/smd-ros-rpm-release/%s-release.git' % r.name
+                re_url = re.match('(http|https|git|ssh)://(git@)?github\.com[:/]([^/]*)/(.*)', r.url)
+                if not re_url:
+                    print('- failed to parse URL: %s' % r.url)
+                    continue
+                temporary_url = '://github.com/smd-ros-rpm-release/%s' % re_url.group(4)
                 if verify_heads('git' + temporary_url, expected_branch):
                     r.url = 'https' + temporary_url
                     print('- using workaround URL since no RPM branch exists: %s' % r.url)

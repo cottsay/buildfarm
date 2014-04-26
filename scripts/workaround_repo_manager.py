@@ -67,6 +67,10 @@ if __name__ == '__main__':
             continue
 
         r = rd.get_repo(repo_name)
+
+        if not r.full_version:
+            continue
+
         print('%s %s:' % (r.name, r.full_version))
 
         r_re = re.match(url_re, r.url)
@@ -76,14 +80,23 @@ if __name__ == '__main__':
 
         real_org = r_re.group(3)
         real_name = r_re.group(4)[0:-4] if r_re.group(4).endswith('.git') else r_re.group(4)
-        real_repo = gh.get_repo('%s/%s' % (real_org, real_name))
         real_ver = r.full_version.split('-')[0]
         real_rel = r.full_version.split('-')[1]
 
-        # Check real repo for an RPM branch in our rosdistro
-        if verify_branch(real_repo, args.rosdistro):
-            print('- already has valid release repo')
+        sys.stdout.write('- checking real repo...')
+        sys.stdout.flush()
+        try:
+            real_repo = gh.get_repo('%s/%s' % (real_org, real_name))
+        except:
+            print('failed!')
             continue
+        else:
+            print('done')
+
+        # Check real repo for an RPM branch in our rosdistro
+        #if verify_branch(real_repo, args.rosdistro):
+        #    print('- already has valid release repo')
+        #    continue
 
         # Check for a workaround repo
         if real_name not in gh_org_repos:
@@ -121,6 +134,10 @@ if __name__ == '__main__':
 
         if temp_dir:
             sys.stdout.write('- removing %s...' % (temp_dir,))
-            shutil.rmtree(temp_dir)
-            print('done')
+            try:
+                shutil.rmtree(temp_dir)
+            except:
+                print('failed!')
+            else:
+                print('done')
 
