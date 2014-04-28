@@ -77,7 +77,7 @@ fi
 rm -f $WORKSPACE/output/*.src.rpm
 
 # Run rpmlint (for stability testing)
-rpmlint $WORKSPACE/output/*.rpm || true
+rpmlint $WORKSPACE/output/*.rpm 2>&1 | grep -v -e dir-or-file-in-opt -e devel-file-in-non-devel-package -e no-documentation || true
 
 # Ensure package.xml is installed
 rpm -qlp $WORKSPACE/output/*.rpm | grep -q package.xml$ || echo "WARNING: package.xml not present in RPM"
