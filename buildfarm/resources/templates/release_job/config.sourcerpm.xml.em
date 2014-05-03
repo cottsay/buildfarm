@@ -94,6 +94,8 @@ if (manager.logContains(".*hudson.plugins.git.GitException: Could not clone.*"))
 	reschedule_build("Yum database failure")
 } else if (manager.logContains(".*Metadata file does not match checksum.*")) {
 	reschedule_build("Yum database failure")
+} else if (manager.logContains(".*[Errno 2] No such file or directory.*")) {
+	reschedule_build("Yum database failure")
 } else if (manager.logContains(".*\\[Errno 16\\] error setting timestamp on file.*")) {
 	reschedule_build("Internal failure in Yum")
 } else if (manager.logContains(".*\\[Errno 256\\] No more mirrors to try.*")) {
