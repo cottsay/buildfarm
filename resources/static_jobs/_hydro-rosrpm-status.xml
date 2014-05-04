@@ -54,9 +54,11 @@ Generated from buildfarm/resources/static_jobs. Do not edit on Jenkins but in th
 
 export PYTHONPATH=$WORKSPACE/monitored_vcs
 
+mkdir -p $WORKSPACE/hydro_pkg_cache
 $WORKSPACE/monitored_vcs/scripts/generate_status_page.py hydro --basedir $WORKSPACE/hydro_pkg_cache --platform fedora
 scp -o StrictHostKeyChecking=no -r $WORKSPACE/hydro_pkg_cache/hydro.* $WORKSPACE/monitored_vcs/resources/css $WORKSPACE/monitored_vcs/resources/js rosbot@csc.mcs.sdsmt.edu:/mnt/storage/ros_build_status/
 
+mkdir -p $WORKSPACE/hydro_mirror_pkg_cache
 $WORKSPACE/monitored_vcs/scripts/generate_status_page.py hydro --basedir $WORKSPACE/hydro_mirror_pkg_cache --resources .. --shadow-repo http://csc.mcs.sdsmt.edu/smd-ros-shadow-fixed/ --public-repo http://csc.mcs.sdsmt.edu/smd-ros/ --platform fedora
 scp -o StrictHostKeyChecking=no $WORKSPACE/hydro_mirror_pkg_cache/hydro.* rosbot@csc.mcs.sdsmt.edu:/mnt/storage/ros_build_status/mirror/</command>
     </hudson.tasks.Shell>
