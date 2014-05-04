@@ -17,6 +17,8 @@ from apt_data import RosdistroVersion, load_url
 
 from fedora_vmap import fedora_ver
 
+from rpminfo import read_repository
+
 def get_version_data(rootdir, rosdistro_name, ros_repos, distro_arches, update_cache=True):
     rosdistro_data = RosdistroData(rosdistro_name)
 
@@ -28,17 +30,17 @@ def get_version_data(rootdir, rosdistro_name, ros_repos, distro_arches, update_c
             # download list of source packages
             da_str = "SRPMS/%s" % fedora_ver[d]
             url = os.path.join(ros_repos[repo_type], 'linux/%s/SRPMS' % fedora_ver[d])
-            datafile = fetch_primary_xml_file(rootdir, repo_type, da_str, url, reuse_existing=not update_cache)
+            pkgs = read_repository(url)
             # extract information
-            rpm_data.fill_versions_xml(repo_type, d, 'source', datafile)
+            rpm_data.fill_versions(repo_type, d, 'source', pkgs)
 
         for (d, a) in distro_arches:
             # download list of binary packages
             da_str = "%s/%s" % (a, fedora_ver[d])
             url = os.path.join(ros_repos[repo_type], 'linux/%s/%s' % (fedora_ver[d], a))
-            datafile = fetch_primary_xml_file(rootdir, repo_type, da_str, url, reuse_existing=not update_cache)
+            pkgs = read_repository(url)
             # extract information
-            rpm_data.fill_versions_xml(repo_type, d, a, datafile)
+            rpm_data.fill_versions(repo_type, d, a, pkgs)
 
     return rosdistro_data, rpm_data
 
@@ -103,26 +105,11 @@ class RpmData(object):
             return None
         return self.rpm_packages[rpm_name].get_version(repo_type, distro_arch)
 
-    def fill_versions_xml(self, repo_type, distro, arch, datafile):
-        """
-        Extract information from rpm primary.xml files and fill in the versions.
-        """
-        logging.debug('Reading file: %s' % datafile)
-        data = {}
-        # split package blocks
-        with open(datafile, 'r') as f:
-            pkgdb = minidom.parseString(f.read())
-
-        for pkg in pkgdb.getElementsByTagName('package'):
-            if pkg.getAttribute('type') != 'rpm':
-                continue
-            rpm_name = pkg.getElementsByTagName('name')[0].firstChild.data
-            rpm_version_obj = pkg.getElementsByTagName('version')[0]
-            rpm_version = rpm_version_obj.getAttribute('ver') + '-' + rpm_version_obj.getAttribute('rel')
-            if rpm_name not in self.rpm_packages:
-                self.rpm_packages[rpm_name] = RpmVersion(rpm_name)
-            self.rpm_packages[rpm_name].add_version(repo_type, '%s_%s' % (distro, arch), rpm_version)
-
+    def fill_versions(self, repo_type, distro, arch, pkgs):
+        for pkg in pkgs:
+            if pkg.name not in self.rpm_packages:
+                self.rpm_packages[pkg.name] = RpmVersion(pkg.name)
+            self.rpm_packages[pkg.name].add_version(repo_type, '%s_%s' % (distro, arch), '%s-%s' % (pkg.version, pkg.pkgrel))
 
 class RpmVersion(object):
 
@@ -136,34 +123,3 @@ class RpmVersion(object):
     def get_version(self, repo_type, distro_arch):
         return self._versions.get((repo_type, distro_arch), None)
 
-
-def parse_primary(repomd_str):
-    for data_entry in minidom.parseString(repomd_str).getElementsByTagName('data'):
-        if data_entry.getAttribute('type') == 'primary':
-            return data_entry.getElementsByTagName('location')[0].getAttribute('href')
-
-
-def fetch_primary_xml_file(rootdir, repo_type, da_str, url, reuse_existing=False):
-    path = os.path.join(rootdir, da_str, repo_type)
-    gen_path = os.path.join(path, 'gen')
-    if not os.path.exists(gen_path):
-        os.makedirs(gen_path)
-    primary_path = os.path.join(gen_path, 'primary.xml')
-    if not reuse_existing or not os.path.exists(primary_path):
-        logging.debug('Downloading RPM repomd file: %s' % url)
-        repomd_str = load_url(os.path.join(url, 'repodata', 'repomd.xml'))
-        #repomd_path = os.path.join(gen_path, 'repomd.xml')
-        #with open(repomd_path, 'w') as f:
-        #    f.write(repomd_str)
-        primary_gz_name = parse_primary(repomd_str)
-        primary_gz_str = load_url(os.path.join(url, primary_gz_name))
-        #primary_gz_path = os.path.join(path, os.path.basename(primary_gz_name))
-        #with open(primary_gz_path, 'wb') as f:
-        #    f.write(primary_gz_str)
-        primary_gz_stream = StringIO(primary_gz_str)
-        g = gzip.GzipFile(fileobj=primary_gz_stream, mode='rb')
-        with open(primary_path, 'w') as f:
-            f.write(g.read())
-    else:
-        logging.debug('Reuse RPM list file: %s' % primary_path)
-    return primary_path
