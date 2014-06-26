@@ -192,7 +192,7 @@ if (manager.logContains(".*hudson.plugins.git.GitException: Could not clone.*"))
 	reschedule_build("Yum database failure")
 } else if (manager.logContains(".*Metadata file does not match checksum.*")) {
 	reschedule_build("Yum database failure")
-} else if (manager.logContains(".*[Errno 2] No such file or directory.*")) {
+} else if (manager.logContains(".*\\[Errno 2\\] No such file or directory.*")) {
 	reschedule_build("Yum database failure")
 } else if (manager.logContains(".*building-source: Check uncompressed DB failed.*")) {
 	reschedule_build("Yum database failure during source RPM download")
