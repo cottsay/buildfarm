@@ -15,17 +15,15 @@ from time import sleep
 url_re = re.compile('(http|https|git|ssh)://(git@)?github\.com[:/]([^/]*)/(.*)')
 
 def parse_options():
-    parser = argparse.ArgumentParser(description='Manages GitHub workaround release repositories')
+    parser = argparse.ArgumentParser(description='Verifies GitHub workaround release repositories')
     parser.add_argument(dest='key',
                         help='Github OAuth key to authenticate using.')
     parser.add_argument(dest='rosdistro',
                         help='The ros distro. fuerte, groovy, hydro, ...')
     parser.add_argument('--org', dest='org', default='smd-ros-rpm-release',
-                        help='GitHub organization to fork the repositories into. Default: smd-ros-rpm-release')
+                        help='GitHub organization to check for workaround repos within. Default: smd-ros-rpm-release')
     parser.add_argument('--repos', nargs='+',
-                        help='A list of repository (or stack) names to create. Default: forks all')
-    parser.add_argument('--delete-existing-workaround', action='store_true', default=False,
-                        help='Deletes the existing workaround repo and do nothing else')
+                        help='A list of repository (or stack) names to verify. Default: forks all')
 
     args = parser.parse_args()
     return args
@@ -34,6 +32,13 @@ def verify_branch(repo, rosdistro=None):
     expected_branch = 'rpm/' if not rosdistro else 'rpm/%s/' % (rosdistro,)
     for b in repo.get_branches():
         if b.name.startswith(expected_branch):
+            return True
+    return False
+
+def verify_tag(repo, rosdistro, package, version):
+    expected_tag = 'rpm/ros-%s-%s-%s_' % (rosdistro, package.lower().replace('_', '-'), version)
+    for t in repo.get_tags():
+        if t.name.startswith(expected_tag):
             return True
     return False
 
@@ -91,72 +96,30 @@ if __name__ == '__main__':
         try:
             real_repo = gh.get_repo('%s/%s' % (real_org, real_name))
         except:
-            print('failed!')
+            print('\033[91mfailed!\033[0m')
             continue
         else:
             print('done')
 
         # Check real repo for an RPM branch in our rosdistro
-        if verify_branch(real_repo, args.rosdistro) and not args.delete_existing_workaround:
-            print('- already has valid release repo')
+        if verify_branch(real_repo, args.rosdistro) and verify_tag(real_repo, args.rosdistro, r.name, r.full_version):
+            print('- \033[92malready has valid release repo\033[0m')
             continue
 
         # Check for a workaround repo
-        if args.delete_existing_workaround:
-            if real_name in gh_org_repos:
-                sys.stdout.write('- deleting workaround repo...')
-                sys.stdout.flush()
-                try:
-                    gh_org_repos[real_name].delete()
-                    del gh_org_repos[real_name]
-                except:
-                    print('failed!')
-                else:
-                    print('done')
-            else:
-                print('- no workaround repo found')
-            continue
-        elif real_name not in gh_org_repos:
+        if real_name not in gh_org_repos:
             try:
                 gh_org_repos[real_name] = gh_org.get_repo(real_name)
             except UnknownObjectException:
-                # Workaround repo doesn't exist, so fork it
-                sys.stdout.write('- forking...')
-                sys.stdout.flush()
-                gh_org_repos[real_name] = gh_org.create_fork(real_repo)
-                # Cooldown
-                sleep(2.0)
-                print('done')
+                # Workaround repo doesn't exist
+                print('- \033[91mno valid workaround repo\033[0m')
+                continue
 
         if verify_branch(gh_org_repos[real_name], args.rosdistro):
-            print('- already has valid workaround repo')
-            continue
-
-        temp_dir = tempfile.mkdtemp()
-        sys.stdout.write('- cloning into %s...' % (temp_dir,))
-        sys.stdout.flush()
-        try:
-            subprocess.check_call(['git', 'clone', '--quiet', gh_org_repos[real_name].ssh_url, temp_dir])
-            print('done')
-
-            sys.stdout.write('- generating RPM branch...')
-            sys.stdout.flush()
-            subprocess.check_call('cd %s && git-bloom-generate -y rosrpm --prefix release/%s %s --unsafe -i %s >> /dev/null' % (temp_dir, args.rosdistro, args.rosdistro, real_rel), shell=True)
-            print('done')
-
-            sys.stdout.write('- pushing back to GitHub...')
-            sys.stdout.flush()
-            subprocess.check_call('cd %s && git push --quiet --all && git push --quiet --tags' % (temp_dir,), shell=True)
-            print('done')
-        except:
-            print('failed!')
-
-        if temp_dir:
-            sys.stdout.write('- removing %s...' % (temp_dir,))
-            try:
-                shutil.rmtree(temp_dir)
-            except:
-                print('failed!')
+            if verify_tag(gh_org_repos[real_name], args.rosdistro, r.name, r.full_version):
+                print('- \033[93malready has valid workaround repo\033[0m')
             else:
-                print('done')
+                print('- \033[95mworkaround repo exists, but the current tag is out of date\033[0m')
+        else:
+            print('- \033[94mworkaround repo exists, but no valid branches\033[0m')
 
