@@ -62,7 +62,7 @@ def verify_heads(repo_uri, expected_head):
     process = Popen(['git', 'ls-remote', '--heads', repo_uri, expected_head], stdout=PIPE, stderr=PIPE)
     heads = process.communicate()[0]
     if not process.poll() == 0:
-        tags = ""
+        heads = ""
 
     head_list = []
     for head in heads.split('\n'):
@@ -74,6 +74,25 @@ def verify_heads(repo_uri, expected_head):
     #else:
     #    print("No matching head found. Are you sure you pointed to the right repository or the version is right?, expected %s:\nHeads:\n%s" % (expected_head, heads))
     return head_list or None
+
+
+def verify_tags(repo_uri, expected_tag):
+    expected_tag = 'refs/tags/' + expected_tag
+    process = Popen(['git', 'ls-remote', '--tags', repo_uri, expected_tag], stdout=PIPE, stderr=PIPE)
+    tags = process.communicate()[0]
+    if not process.poll() == 0:
+        tags = ""
+
+    tag_list = []
+    for tag in tags.split('\n'):
+        if tag != '':
+            tag_list += [tags.split()[-1]]
+
+    #if expected_tag in tag_list:
+    #    return expected_tag
+    #else:
+    #    print("No matching tag found. Are you sure you pointed to the right repository or the version is right?, expected %s:\nTags:\n%s" % (expected_tag, tags))
+    return tag_list or None
 
 
 def doit(rd, distros, arches, target_repository, fqdn, jobs_graph, rosdistro, packages, dry_maintainers, commit=False, delete_extra_jobs=False, whitelist_repos=None, sourcepkg_timeout=None, binarypkg_timeout=None, ssh_key_id=None, platform='ubuntu'):
@@ -111,13 +130,14 @@ def doit(rd, distros, arches, target_repository, fqdn, jobs_graph, rosdistro, pa
         # TODO: Workaround until repos have rpm branches
         if platform == 'fedora':
             import re
-            expected_branch = 'rpm/' + rosdistro + '/*'
-            if not verify_heads(r.url, expected_branch):
+            expected_tag = 'rpm/%s-%s_%s' % (rd.debianize_package_name(r.packages.keys()[0]), r.full_version, target_distros[0])
+            if not verify_tags(r.url, expected_tag):
                 re_url = re.match('(http|https|git|ssh)://(git@)?github\.com[:/]([^/]*)/(.*)', r.url)
                 if not re_url:
                     print('- failed to parse URL: %s' % r.url)
                     continue
                 temporary_url = '://github.com/smd-ros-rpm-release/%s' % re_url.group(4)
+                expected_branch = 'rpm/' + rosdistro + '/*'
                 if verify_heads('git' + temporary_url, expected_branch):
                     r.url = 'https' + temporary_url
                     print('- using workaround URL since no RPM branch exists: %s' % r.url)
