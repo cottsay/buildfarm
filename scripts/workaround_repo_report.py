@@ -102,7 +102,7 @@ if __name__ == '__main__':
             print('done')
 
         # Check real repo for an RPM branch in our rosdistro
-        if verify_branch(real_repo, args.rosdistro) and verify_tag(real_repo, args.rosdistro, r.name, r.full_version):
+        if verify_branch(real_repo, args.rosdistro) and verify_tag(real_repo, args.rosdistro, r.packages.keys()[0], r.full_version):
             print('- \033[92malready has valid release repo\033[0m')
             continue
 
@@ -116,7 +116,7 @@ if __name__ == '__main__':
                 continue
 
         if verify_branch(gh_org_repos[real_name], args.rosdistro):
-            if verify_tag(gh_org_repos[real_name], args.rosdistro, r.name, r.full_version):
+            if verify_tag(gh_org_repos[real_name], args.rosdistro, r.packages.keys()[0], r.full_version):
                 print('- \033[93malready has valid workaround repo\033[0m')
             else:
                 print('- \033[95mworkaround repo exists, but the current tag is out of date\033[0m')
