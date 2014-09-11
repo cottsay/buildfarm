@@ -163,6 +163,7 @@ println ""
 // CHECK FOR VARIOUS REASONS TO RETRIGGER JOB
 // also triggered when a build step has failed
 import hudson.model.Cause
+import hudson.model.Result
 import org.jvnet.hudson.plugins.groovypostbuild.GroovyPostbuildAction
 
 def reschedule_build(msg) {
@@ -180,6 +181,11 @@ def reschedule_build(msg) {
 	}
 	manager.addInfoBadge("Log contains '" + msg + "' - scheduled new build...")
 	manager.build.project.scheduleBuild(new Cause.UserIdCause())
+}
+
+def abort_build(msg) {
+        manager.addInfoBadge("Log contains '" + msg + "' - build aborted.")
+        manager.build.setResult(Result.ABORTED)
 }
 
 if (manager.logContains(".*hudson.plugins.git.GitException: Could not clone.*")) {
@@ -206,6 +212,8 @@ if (manager.logContains(".*hudson.plugins.git.GitException: Could not clone.*"))
 	reschedule_build("Build root was already in use")
 } else if (manager.logContains(".*\\[Errno 14\\] HTTP Error 416 - Requested Range Not Satisfiable.*")) {
 	reschedule_build("Yum failed to acquire repository metadata")
+} else if (manager.logContains("error: Architecture is not included:.*")) {
+        abort_build("This package does not support the given architecture")
 }
 </groovyScript>
       <behavior>0</behavior>
