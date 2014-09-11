@@ -128,10 +128,12 @@ def doit(rd, distros, arches, target_repository, fqdn, jobs_graph, rosdistro, pa
         print('Configuring WET repo "%s" at "%s" for "%s"' % (r.name, r.url, target_distros))
 
         # TODO: Workaround until repos have rpm branches
+        manual_workarounds = []
+        manual_workarounds += ['openni2_camera'] # valid branch has wrong rosdep entry for openni2-devel
         if platform == 'fedora':
             import re
             expected_tag = 'rpm/%s-%s_%s' % (rd.debianize_package_name(r.packages.keys()[0]), r.full_version, target_distros[0])
-            if not verify_tags(r.url, expected_tag):
+            if r.name in manual_workarounds or not verify_tags(r.url, expected_tag):
                 re_url = re.match('(http|https|git|ssh)://(git@)?github\.com[:/]([^/]*)/(.*)', r.url)
                 if not re_url:
                     print('- failed to parse URL: %s' % r.url)
