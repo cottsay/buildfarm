@@ -132,6 +132,8 @@ def doit(rd, distros, arches, target_repository, fqdn, jobs_graph, rosdistro, pa
         manual_workarounds += ['openni2_camera'] # valid branch has wrong rosdep entry for openni2-devel
         manual_workarounds += ['cob_manipulation'] # https://github.com/ipa320/cob_manipulation/pull/44
         manual_workarounds += ['neo_driver'] # https://github.com/neobotix/neo_driver/pull/3
+        manual_workarounds += ['opencv3'] # https://github.com/ros-gbp/opencv3-release/issues/2
+        manual_workarounds += ['pointgrey_camera_driver'] # https://github.com/ros-drivers/pointgrey_camera_driver/issues/2
         if platform == 'fedora':
             import re
             expected_tag = 'rpm/%s-%s_%s' % (rd.debianize_package_name(r.packages.keys()[0]), r.full_version, target_distros[0])
