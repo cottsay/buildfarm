@@ -138,6 +138,7 @@ def doit(rd, distros, arches, target_repository, fqdn, jobs_graph, rosdistro, pa
         manual_workarounds += ['libpointmatcher'] # Not sure how to phrase this one yet
         manual_workarounds += ['hector_gazebo'] # Bug in Fedora pkgconfig (to-be-filed)
         manual_workarounds += ['gazebo_ros_pkgs'] # https://github.com/ros-simulation/gazebo_ros_pkgs/pull/244
+        manual_workarounds += ['jsk_roseus'] # Bad packaging practices
         if platform == 'fedora':
             import re
             expected_tag = 'rpm/%s-%s_%s' % (rd.debianize_package_name(r.packages.keys()[0]), r.full_version, target_distros[0])
