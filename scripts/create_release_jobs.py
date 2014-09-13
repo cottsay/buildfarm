@@ -129,16 +129,19 @@ def doit(rd, distros, arches, target_repository, fqdn, jobs_graph, rosdistro, pa
 
         # TODO: Workaround until repos have rpm branches
         manual_workarounds = []
-        manual_workarounds += ['openni2_camera'] # valid branch has wrong rosdep entry for openni2-devel
-        manual_workarounds += ['cob_manipulation'] # https://github.com/ipa320/cob_manipulation/pull/44
-        manual_workarounds += ['neo_driver'] # https://github.com/neobotix/neo_driver/pull/3
-        manual_workarounds += ['opencv3'] # https://github.com/ros-gbp/opencv3-release/issues/2
-        manual_workarounds += ['pointgrey_camera_driver'] # https://github.com/ros-drivers/pointgrey_camera_driver/issues/2
-        manual_workarounds += ['rospilot'] # https://github.com/rospilot/rospilot-release/issues/1
-        manual_workarounds += ['libpointmatcher'] # Not sure how to phrase this one yet
-        manual_workarounds += ['hector_gazebo'] # Bug in Fedora pkgconfig (to-be-filed)
-        manual_workarounds += ['gazebo_ros_pkgs'] # https://github.com/ros-simulation/gazebo_ros_pkgs/pull/244
-        manual_workarounds += ['jsk_roseus'] # Bad packaging practices
+        if rosdistro == 'indigo':
+            manual_workarounds += ['openni2_camera'] # valid branch has wrong rosdep entry for openni2-devel
+            manual_workarounds += ['cob_manipulation'] # https://github.com/ipa320/cob_manipulation/pull/44
+            manual_workarounds += ['neo_driver'] # https://github.com/neobotix/neo_driver/pull/3
+            manual_workarounds += ['opencv3'] # https://github.com/ros-gbp/opencv3-release/issues/2
+            manual_workarounds += ['pointgrey_camera_driver'] # https://github.com/ros-drivers/pointgrey_camera_driver/issues/2
+            manual_workarounds += ['rospilot'] # https://github.com/rospilot/rospilot-release/issues/1
+            manual_workarounds += ['libpointmatcher'] # Not sure how to phrase this one yet
+            manual_workarounds += ['hector_gazebo'] # Bug in Fedora pkgconfig (to-be-filed)
+            manual_workarounds += ['gazebo_ros_pkgs'] # https://github.com/ros-simulation/gazebo_ros_pkgs/pull/244
+            manual_workarounds += ['jsk_roseus'] # Bad packaging practices
+        elif rosdistro == 'hydro':
+            manual_workarounds += ['robot_model'] # Testing
         if platform == 'fedora':
             import re
             expected_tag = 'rpm/%s-%s_%s' % (rd.debianize_package_name(r.packages.keys()[0]), r.full_version, target_distros[0])
