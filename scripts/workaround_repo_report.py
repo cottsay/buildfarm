@@ -136,10 +136,13 @@ if __name__ == '__main__':
             print('- \033[94mworkaround repo exists, but no valid branches\033[0m')
             num_invalid_workaround += 1
 
+    if num_total == 0:
+        num_total = 0.0000001
+
     print('')
     print('Summary:')
     print('- \033[92mvalid release repo:\033[0m %d (%01.1f%%)' % (num_valid_release, 100.0 * num_valid_release / num_total))
     print('- \033[93mvalid workaround repo:\033[0m %d (%01.1f%%)' % (num_valid_workaround, 100.0 * num_valid_workaround / num_total))
     print('- \033[95minvalid workaround repo:\033[0m %d (%01.1f%%)' % (num_invalid_workaround, 100.0 * num_invalid_workaround / num_total))
     print('- \033[91mmissing workaround repo:\033[0m %d (%01.1f%%)' % (num_missing_workaround, 100.0 * num_missing_workaround / num_total))
-    print('- total: %s' % (num_total,))
+    print('- total: %d' % (num_total,))
