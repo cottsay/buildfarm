@@ -130,18 +130,18 @@ def doit(rd, distros, arches, target_repository, fqdn, jobs_graph, rosdistro, pa
         # TODO: Workaround until repos have rpm branches
         manual_workarounds = []
         if rosdistro == 'indigo':
-            manual_workarounds += ['openni2_camera'] # valid branch has wrong rosdep entry for openni2-devel
-            manual_workarounds += ['neo_driver'] # https://github.com/neobotix/neo_driver/pull/3
-            manual_workarounds += ['pointgrey_camera_driver'] # https://github.com/ros-drivers/pointgrey_camera_driver/issues/2
-            manual_workarounds += ['libpointmatcher'] # TODO: Not sure how to phrase this one yet
-            manual_workarounds += ['hector_gazebo'] # Waiting for gazebo-devel-3.0.0-6 to drop in f20
-            manual_workarounds += ['gazebo_ros_pkgs'] # https://github.com/ros-simulation/gazebo_ros_pkgs/pull/244
-            manual_workarounds += ['jsk_roseus'] # Bad packaging practices
-            manual_workarounds += ['cob_extern'] # https://github.com/ipa320/cob_extern/issues/42
-            manual_workarounds += ['uwsim_bullet'] # https://github.com/uji-ros-pkg/uwsim_bullet/pull/1
-            manual_workarounds += ['romeo_robot'] # https://github.com/ros-aldebaran/romeo_robot/pull/2
-            manual_workarounds += ['nanomsg'] # https://github.com/stonier/nanomsg/pull/2
             manual_workarounds += ['cob_control'] # https://github.com/ipa320/cob_control/pull/13
+            manual_workarounds += ['cob_extern'] # https://github.com/ipa320/cob_extern/issues/42
+            manual_workarounds += ['gazebo_ros_pkgs'] # https://github.com/ros-simulation/gazebo_ros_pkgs/pull/244
+            manual_workarounds += ['hector_gazebo'] # Waiting for gazebo-devel-3.0.0-6 to drop in f20
+            manual_workarounds += ['jsk_roseus'] # Bad packaging practices
+            manual_workarounds += ['libpointmatcher'] # TODO: Not sure how to phrase this one yet
+            manual_workarounds += ['nanomsg'] # https://github.com/stonier/nanomsg/pull/2
+            manual_workarounds += ['neo_driver'] # https://github.com/neobotix/neo_driver/pull/3
+            manual_workarounds += ['openni2_camera'] # valid branch has wrong rosdep entry for openni2-devel
+            manual_workarounds += ['pointgrey_camera_driver'] # https://github.com/ros-drivers/pointgrey_camera_driver/issues/2
+            manual_workarounds += ['romeo_robot'] # https://github.com/ros-aldebaran/romeo_robot/pull/2
+            manual_workarounds += ['uwsim_bullet'] # https://github.com/uji-ros-pkg/uwsim_bullet/pull/1
         elif rosdistro == 'hydro':
             manual_workarounds += ['robot_model'] # Testing
         if platform == 'fedora':
