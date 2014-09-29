@@ -95,7 +95,7 @@ rpmlint $WORKSPACE/output/*.rpm 2>&1 | grep -v -e dir-or-file-in-opt -e devel-fi
 rpm -qlp $WORKSPACE/output/*.rpm | grep -q package.xml$ || echo "WARNING: package.xml not present in RPM"
 
 # Upload invalidate and add to the repo
-UPLOAD_DIR=/tmp/upload/$PACKAGE/$DISTRO_VER/$ARCH
+UPLOAD_DIR=/mnt/storage/upload_temp/$PACKAGE/$DISTRO_VER/$ARCH
 
 ssh rosbuild@@$ROS_REPO_FQDN -- mkdir -p $UPLOAD_DIR
 ssh rosbuild@@$ROS_REPO_FQDN -- rm -rf $UPLOAD_DIR/*

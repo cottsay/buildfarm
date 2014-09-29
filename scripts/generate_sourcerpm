@@ -71,7 +71,7 @@ def build_source_rpm(repo_uri, tag, packagename, distro, output, base_mock_cfg):
 
 
 def upload_source_rpm(distros, repo_fqdn, input_directory, packagename):
-    upload_root = "/tmp/upload/%s" % packagename
+    upload_root = "/mnt/storage/upload_temp/%s" % packagename
 
     upload_root_list = []
 
