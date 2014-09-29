@@ -106,6 +106,8 @@ if (manager.logContains(".*hudson.plugins.git.GitException: Could not clone.*"))
 	reschedule_build("Build root was already in use")
 } else if (manager.logContains(".*\\[Errno 14\\] HTTP Error 416 - Requested Range Not Satisfiable.*")) {
 	reschedule_build("Yum failed to acquire repository metadata")
+} else if (manager.logContains("ssh_exchange_identification: Connection closed by remote host")) {
+	reschedule_build("SSH communication failure")
 }
 </groovyScript>
       <behavior>0</behavior>
