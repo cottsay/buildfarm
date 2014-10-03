@@ -16,7 +16,7 @@
       <hudson.plugins.git.UserRemoteConfig>
         <name/>
         <refspec/>
-        <url>git://github.com/ros-infrastructure/buildfarm.git</url>
+        <url>git://github.com/cottsay/buildfarm.git</url>
       </hudson.plugins.git.UserRemoteConfig>
     </userRemoteConfigs>
     <branches>
@@ -322,7 +322,7 @@ if (mark_unstable) {
       <setForMatrix>false</setForMatrix>
     </hudson.plugins.descriptionsetter.DescriptionSetterPublisher>
     <hudson.tasks.Mailer>
-      <recipients>ros-buildfarm-release@@googlegroups.com @(NOTIFICATION_EMAIL)</recipients>
+      <recipients>logans@@cottsay.net</recipients>
       <dontNotifyEveryUnstableBuild>false</dontNotifyEveryUnstableBuild>
       <sendToIndividuals>false</sendToIndividuals>
     </hudson.tasks.Mailer>
