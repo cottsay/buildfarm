@@ -142,22 +142,21 @@ def doit(rd, distros, arches, target_repository, fqdn, jobs_graph, rosdistro, pa
             manual_workarounds += ['uwsim_bullet'] # https://github.com/uji-ros-pkg/uwsim_bullet/pull/1
         elif rosdistro == 'hydro':
             manual_workarounds += ['robot_model'] # Testing
-        if platform == 'fedora':
-            import re
-            expected_tag = 'rpm/%s-%s_%s' % (rd.debianize_package_name(r.packages.keys()[0]), r.full_version, target_distros[0])
-            if r.name in manual_workarounds or not verify_tags(r.url, expected_tag):
-                re_url = re.match('(http|https|git|ssh)://(git@)?github\.com[:/]([^/]*)/(.*)', r.url)
-                if not re_url:
-                    print('- failed to parse URL: %s' % r.url)
-                    continue
-                temporary_url = '://github.com/smd-ros-rpm-release/%s' % re_url.group(4)
-                expected_branch = 'rpm/' + rosdistro + '/*'
-                if verify_heads('git' + temporary_url, expected_branch):
-                    r.url = 'https' + temporary_url
-                    print('- using workaround URL since no RPM branch exists: %s' % r.url)
-                else:
-                    print('- skipping all of "%s" since no RPM branch or workaround repo exist' % r.name)
-                    continue
+        import re
+        expected_tag = 'rpm/%s-%s_%s' % (rd.debianize_package_name(r.packages.keys()[0]), r.full_version, target_distros[0])
+        if r.name in manual_workarounds or not verify_tags(r.url, expected_tag):
+            re_url = re.match('(http|https|git|ssh)://(git@)?github\.com[:/]([^/]*)/(.*)', r.url)
+            if not re_url:
+                print('- failed to parse URL: %s' % r.url)
+                continue
+            temporary_url = '://github.com/smd-ros-rpm-release/%s' % re_url.group(4)
+            expected_branch = 'rpm/' + rosdistro + '/*'
+            if verify_heads('git' + temporary_url, expected_branch):
+                r.url = 'https' + temporary_url
+                print('- using workaround URL since no RPM branch exists: %s' % r.url)
+            else:
+                print('- skipping all of "%s" since no RPM branch or workaround repo exist' % r.name)
+                continue
         # End workaround
 
         for p in sorted(r.packages.iterkeys()):
@@ -278,7 +277,7 @@ if __name__ == '__main__':
             args.arches = rd.get_arches()
 
         # TODO Fedora Arch Workaround
-        if 'amd64' in args.arches:
+        if 'amd64' in args.arches and args.platform == 'fedora':
             args.arches.remove('amd64')
             args.arches.append('x86_64',)
         # End Workaround
