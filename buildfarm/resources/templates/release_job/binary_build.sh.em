@@ -67,7 +67,8 @@ cd $work_dir
 
 
 # Pull the sourcedeb
-sudo apt-get source $PACKAGE -c $aptconffile
+#sudo apt-get source $PACKAGE -c $aptconffile
+cp /var/lib/jenkins/workspace/${PACKAGE}_sourcedeb/output/${distro}/*.{dsc,tar.gz} ./
 
 # extract version number from the dsc file
 version=`ls *.dsc | sed s/${PACKAGE}_// | sed s/$distro\.dsc//`
