@@ -132,16 +132,26 @@ def doit(rd, distros, arches, target_repository, fqdn, jobs_graph, rosdistro, pa
         if rosdistro == 'indigo':
             manual_workarounds += ['gazebo_ros_pkgs'] # https://github.com/ros-simulation/gazebo_ros_pkgs/pull/244
             manual_workarounds += ['hector_gazebo'] # Waiting for gazebo-devel-3.0.0-6 to drop in f20
+            manual_workarounds += ['jsk_common'] # https://github.com/jsk-ros-pkg/jsk_common/pull/565
             manual_workarounds += ['jsk_roseus'] # Bad packaging practices
             manual_workarounds += ['libpointmatcher'] # TODO: Not sure how to phrase this one yet
             manual_workarounds += ['neo_driver'] # https://github.com/neobotix/neo_driver/pull/3
+            manual_workarounds += ['openhrp3'] # TODO
             manual_workarounds += ['openni2_camera'] # valid branch has wrong rosdep entry for openni2-devel
-            manual_workarounds += ['openrtm_aist'] # ugh...
+            manual_workarounds += ['openrtm_aist'] # https://github.com/tork-a/openrtm_aist-release/pull/1
+            manual_workarounds += ['openrtm_aist_python'] # https://github.com/tork-a/openrtm_aist_python-release/pull/1
             manual_workarounds += ['pointgrey_camera_driver'] # https://github.com/ros-drivers/pointgrey_camera_driver/issues/2
+            manual_workarounds += ['rqt_graphprofiler'] # https://github.com/osrf/rqt_graphprofiler/pull/28
             manual_workarounds += ['srv_tools'] # https://github.com/srv/srv_tools/pull/3
             manual_workarounds += ['uwsim_bullet'] # https://github.com/uji-ros-pkg/uwsim_bullet/pull/1
+            manual_workarounds += ['warehouse_ros'] # https://github.com/ros-planning/warehouse_ros/pull/17
         elif rosdistro == 'hydro':
-            manual_workarounds += ['robot_model'] # Testing
+            manual_workarounds += ['jsk_common'] # https://github.com/jsk-ros-pkg/jsk_common/pull/565
+            manual_workarounds += ['jsk_control'] # Differing bloom versions
+            manual_workarounds += ['jsk_roseus'] # Bad packaging practices
+            manual_workarounds += ['openni2_camera'] # valid branch has wrong rosdep entry for openni2-devel
+            manual_workarounds += ['robot_model'] # TODO: Testing
+            manual_workarounds += ['warehouse_ros'] # https://github.com/ros-planning/warehouse_ros/pull/17
         import re
         expected_tag = 'rpm/%s-%s_%s' % (rd.debianize_package_name(r.packages.keys()[0]), r.full_version, target_distros[0])
         if r.name in manual_workarounds or not verify_tags(r.url, expected_tag):
