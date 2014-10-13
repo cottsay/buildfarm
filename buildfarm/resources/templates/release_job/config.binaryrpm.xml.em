@@ -214,6 +214,8 @@ if (manager.logContains(".*hudson.plugins.git.GitException: Could not clone.*"))
 	reschedule_build("Yum failed to acquire repository metadata")
 } else if (manager.logContains("ssh_exchange_identification: Connection closed by remote host")) {
 	reschedule_build("SSH communication failure")
+} else if (manager.logContains(".*Error: Error reading from file .*\\.sqlite\\.bz2: invalid data stream")) {
+	reschedule_build("SQLite database failure")
 } else if (manager.logContains("error: Architecture is not included:.*")) {
         abort_build("This package does not support the given architecture")
 }
