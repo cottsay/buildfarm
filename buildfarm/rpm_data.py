@@ -11,6 +11,7 @@ import time
 import urllib2
 from xml.dom import minidom
 import yaml
+from distutils.version import LooseVersion
 
 from rospkg.distro import distro_uri
 from apt_data import RosdistroVersion, load_url
@@ -106,10 +107,17 @@ class RpmData(object):
         return self.rpm_packages[rpm_name].get_version(repo_type, distro_arch)
 
     def fill_versions(self, repo_type, distro, arch, pkgs):
+        da = '%s_%s' % (distro, arch)
         for pkg in pkgs:
+            candidate = '%s-%s' % (pkg.version, pkg.pkgrel)
             if pkg.name not in self.rpm_packages:
                 self.rpm_packages[pkg.name] = RpmVersion(pkg.name)
-            self.rpm_packages[pkg.name].add_version(repo_type, '%s_%s' % (distro, arch), '%s-%s' % (pkg.version, pkg.pkgrel))
+            else:
+                current = self.rpm_packages[pkg.name].get_version(repo_type, da)
+                if current is not None:
+                    if LooseVersion(current) > LooseVersion(candidate):
+                        continue
+            self.rpm_packages[pkg.name].add_version(repo_type, da, candidate)
 
 class RpmVersion(object):
 
