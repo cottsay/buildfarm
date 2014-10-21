@@ -330,6 +330,8 @@ def format_row(row, metadata_columns):
         [is_public_changing_on_sync(c) for c in row[4:]]
     regression = [False] * 4 + \
         [is_regression(c) for c in row[4:]]
+    regressing = [False] * 4 + \
+        [is_regressing(c) for c in row[4:]]
     # Flag if this is dry or a variant so as not to show sourcedebs as red
     no_source = row[3] in ['variant', 'dry']
     # ignore source columns for dry/variant when deciding of columns are homogeneous
@@ -353,6 +355,8 @@ def format_row(row, metadata_columns):
         hidden_texts.append('sync')
     if True in regression:
         hidden_texts.append('regression')
+    if True in regressing:
+        hidden_texts.append('regressing')
     if len(hidden_texts) > 0:
         row[0] += ' <span class="ht">%s</span>' % ' '.join(hidden_texts)
 
@@ -383,6 +387,15 @@ def is_regression(cell):
             v_parts = [int(y) for x in v.split('.') for y in x.split('-')]
             if public_version_parts > v_parts:
                 return True
+    return False
+
+
+def is_regressing(cell):
+    versions = get_cell_versions(cell)
+    fixed_version = versions[-2]
+    if fixed_version != "None":
+        if versions[-3] == "None":
+            return True
     return False
 
 
