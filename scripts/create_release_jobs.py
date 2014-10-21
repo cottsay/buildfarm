@@ -42,6 +42,8 @@ def parse_options():
                         help='A list of repository (or stack) names to create. Default: creates all')
     parser.add_argument('--ssh-key-id',
                         help="Jenkins SSH key ID for accessing the package server")
+    parser.add_argument('--platform', default='ubuntu',
+                        help='Linux platform (ubuntu, fedora)')
     args = parser.parse_args()
     if args.repos and args.delete:
         parser.error('A set of repos to create can not be combined with the --delete option.')
@@ -55,7 +57,7 @@ def parse_options():
     return args
 
 
-def doit(rd, distros, arches, apt_target_repository, fqdn, jobs_graph, rosdistro, packages, dry_maintainers, commit=False, delete_extra_jobs=False, whitelist_repos=None, sourcedeb_timeout=None, binarydeb_timeout=None, ssh_key_id=None):
+def doit(rd, distros, arches, apt_target_repository, fqdn, jobs_graph, rosdistro, packages, dry_maintainers, commit=False, delete_extra_jobs=False, whitelist_repos=None, sourcedeb_timeout=None, binarydeb_timeout=None, ssh_key_id=None, platform='ubuntu'):
     jenkins_instance = None
     jenkins_jobs = []
     if args.commit or delete_extra_jobs:
@@ -70,7 +72,7 @@ def doit(rd, distros, arches, apt_target_repository, fqdn, jobs_graph, rosdistro
     if distros:
         default_distros = distros
     else:
-        default_distros = rd.get_target_distros()
+        default_distros = rd.get_all_target_distros()[platform]
 
     # TODO: pull arches from rosdistro
     target_arches = arches
@@ -112,7 +114,8 @@ def doit(rd, distros, arches, apt_target_repository, fqdn, jobs_graph, rosdistro
                                                   jenkins_jobs=jenkins_jobs,
                                                   sourcedeb_timeout=sourcedeb_timeout,
                                                   binarydeb_timeout=binarydeb_timeout,
-                                                  ssh_key_id=ssh_key_id)
+                                                  ssh_key_id=ssh_key_id,
+                                                  platform=platform)
             #time.sleep(1)
             #print ('individual results', results[pkg_name])
 
@@ -254,7 +257,8 @@ if __name__ == '__main__':
         whitelist_repos=args.repos,
         sourcedeb_timeout=sourcedeb_timeout,
         binarydeb_timeout=binarydeb_timeout,
-        ssh_key_id=args.ssh_key_id)
+        ssh_key_id=args.ssh_key_id,
+        platform=args.platform)
 
     if not args.commit:
         print('This was not pushed to the server.  If you want to do so use "--commit" to do it for real.')

@@ -43,13 +43,13 @@ def get_da_strs(distro_arches):
     return output
 
 
-def get_distro_arches(arches, rosdistro):
+def get_distro_arches(arches, rosdistro, platform='ubuntu'):
     if rosdistro == 'fuerte':
-        from buildfarm.ros_distro_fuerte import get_target_distros
+        from buildfarm.ros_distro_fuerte import get_all_target_distros
     else:
-        from buildfarm.ros_distro import get_target_distros
+        from buildfarm.ros_distro import get_all_target_distros
 
-    distros = get_target_distros(rosdistro)
+    distros = get_all_target_distros(rosdistro)[platform]
     return [(d, a) for d in distros for a in arches]
 
 
@@ -75,7 +75,7 @@ def make_versions_table(rd_data, apt_data,
         prefixes.remove(rosdistro_prefix)
 
     non_distro_debian_names = []
-    for debian_name in apt_data.debian_packages:
+    for debian_name in apt_data.get_packages():
         skip = False
         # skip packages from other ros distros
         for prefix in prefixes:

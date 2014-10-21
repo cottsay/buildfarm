@@ -103,6 +103,9 @@ class AptData(object):
         self.debian_packages = {}
         self._primary_arch = None  # fill with the first used arch
 
+    def get_packages(self):
+        return self.debian_packages
+
     def get_version(self, debian_name, repo_type, distro_arch):
         if not debian_name in self.debian_packages:
             return None

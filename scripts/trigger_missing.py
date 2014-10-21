@@ -28,11 +28,13 @@ def parse_options():
                         help='Only check sourcedeb jobs. Default: all')
     parser.add_argument('--commit', dest='commit',
                         help='Really?', action='store_true')
+    parser.add_argument('--platform', default='ubuntu',
+                        help='Linux platform (ubuntu, fedora)')
     return parser.parse_args()
 
 
 def trigger_if_necessary(da, pkg, rosdistro,
-                         jenkins_instance, missing_by_arch):
+                         jenkins_instance, missing_by_arch, platform='ubuntu'):
     if da != 'source' and 'source' in missing_by_arch and \
             pkg in missing_by_arch['source']:
         print("  Skipping trigger of binarydeb job for package '%s' on arch '%s' as the sourcedeb job will trigger them automatically" % (pkg, da))
@@ -81,7 +83,8 @@ if __name__ == '__main__':
         args.arches,
         args.fqdn,
         rosdistro=args.rosdistro,
-        sourcedeb_only=args.sourcedeb_only)
+        sourcedeb_only=args.sourcedeb_only,
+        platform=args.platform)
 
     print('')
     print('Missing packages:')
@@ -110,7 +113,7 @@ if __name__ == '__main__':
         for da in missing_by_arch:
             for pkg in sorted(missing_by_arch[da]):
                 try:
-                    success = trigger_if_necessary(da, pkg, args.rosdistro, jenkins_instance, missing_by_arch)
+                    success = trigger_if_necessary(da, pkg, args.rosdistro, jenkins_instance, missing_by_arch, args.platform)
                     if success:
                         triggered += 1
                     else:

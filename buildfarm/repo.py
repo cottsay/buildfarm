@@ -220,3 +220,6 @@ def get_depends(repo_url, deb_name, os_platform, arch):
 #        return match[0].split('-')[0]
 #    else:
 #        return None
+
+def pkg_in_repo(repo_url, pkg_name, pkg_version, os_distro, arch, use_regex=True, cache=None, source=False, platform='ubuntu'):
+    return deb_in_repo(repo_url, pkg_name, pkg_version, os_distro, arch, use_regex, cache, source)

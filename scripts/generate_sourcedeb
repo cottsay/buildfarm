@@ -127,7 +127,7 @@ if __name__ == "__main__":
     update_repo(working_dir=args.working, repo_path=repo_path, repo_uri=args.repo_uri)
 
     report_failure = False
-    for d in rd.get_target_distros():
+    for d in rd.get_all_target_distros()['ubuntu']:
 
         tag = verify_debian_tag(repo_path, args.package_name, package_version, d)
         if not tag:
@@ -150,7 +150,7 @@ if __name__ == "__main__":
         if args.noupload:
             print("Noupload argument passed, skipping upload of %s" % args.output)
         else:
-            upload_source_deb(rd.get_target_distros(), args.repo_fqdn, args.repo_path,
+            upload_source_deb(rd.get_all_target_distros()['ubuntu'], args.repo_fqdn, args.repo_path,
                               args.output,
                               args.package_name
                               )

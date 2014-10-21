@@ -48,6 +48,8 @@ def parse_options(args=sys.argv[1:]):
     p.add_argument('--da',
                    nargs='+',
                    help='Distro/Arch pairs to query')
+    p.add_argument('--platform', default='ubuntu',
+                   help='Linux platform (ubuntu, fedora)')
     return p.parse_args(args)
 
 
@@ -66,7 +68,7 @@ if __name__ == '__main__':
     elif args.distros:
         distro_arches = [(d, a) for d in args.distros for a in args.arches]
     else:
-        distro_arches = get_distro_arches(args.arches, args.rosdistro)
+        distro_arches = get_distro_arches(args.arches, args.rosdistro, args.platform)
 
     csv_file = os.path.join(args.basedir, '%s.csv' % args.rosdistro)
     if not args.skip_csv:

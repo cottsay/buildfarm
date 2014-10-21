@@ -130,13 +130,21 @@ class Rosdistro:
             self._targets = get_target_distros(self._rosdistro)
         return self._targets
 
-    def get_default_target(self):
-        if self._targets is None:
-            self.get_target_distros()
-        if len(self._targets) == 0:
+    def get_all_target_distros(self):
+        if self._all_targets is None:  # Different than empty list
+            self._all_targets = get_all_target_distros(self._rosdistro)
+        return self._all_targets
+
+    def get_default_target(self, platform='ubuntu'):
+        if self._all_targets is None:
+            self.get_all_target_distros()
+        if platform not in self._all_targets:
+            print("Warning no distros defined for platform %s" % (platform,))
+            return None
+        if len(self._all_targets[platform]) == 0:
             print("Warning no targets defined for distro %s" % self._rosdistro)
             return None
-        return self._targets[0]
+        return self._all_targets[platform][0]
 
     def get_stack_rosinstall_snippet(self, distro=None):
         if not distro:
@@ -163,7 +171,10 @@ class Rosdistro:
 
 
 def get_target_distros(rosdistro):
+    return get_all_target_distros(rosdistro)['ubuntu']
+
+def get_all_target_distros(rosdistro):
     print("Fetching targets")
     index = get_index(get_index_url())
     dist_file = get_distribution_file(index, rosdistro)
-    return dist_file.release_platforms['ubuntu']
+    return dist_file.release_platforms

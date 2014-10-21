@@ -98,9 +98,17 @@ class Rosdistro:
             self._targets = get_target_distros(self._rosdistro)
         return self._targets
 
-    def get_default_target(self):
+    def get_all_target_distros(self):
+        if self._all_targets is None:  # Different than empty list
+            self._all_targets = get_all_target_distros(self._rosdistro)
+        return self._all_targets
+
+    def get_default_target(self, platform='ubuntu'):
         if self._targets is None:
             self.get_target_distros()
+        if platform != 'ubuntu':
+            print("Warning no distros defined for platform %s" % (platform,))
+            return None
         if len(self._targets) == 0:
             print("Warning no targets defined for distro %s" % self._rosdistro)
             return None
@@ -130,6 +138,7 @@ class Rosdistro:
         return rosinstall_data
 
 
+
 def get_target_distros(rosdistro):
     print("Fetching " + URL_PROTOTYPE % 'targets')
     targets_map = yaml.load(urllib2.urlopen(URL_PROTOTYPE % 'targets'))
@@ -138,3 +147,6 @@ def get_target_distros(rosdistro):
         print("Must have exactly one entry for rosdistro %s in targets.yaml" % rosdistro)
         sys.exit(1)
     return my_targets[0][rosdistro]
+
+def get_all_target_distros(rosdistro):
+    return { 'ubuntu': get_target_distros(rosdistro) }
