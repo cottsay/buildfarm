@@ -46,7 +46,6 @@ def parse_options(args=sys.argv[1:]):
                    nargs='+',
                    help='Distributions to query')
     p.add_argument('--arches',
-                   default=['i386', 'amd64'],
                    nargs='+',
                    help='Architectures to query')
     p.add_argument('--da',
@@ -74,6 +73,12 @@ if __name__ == '__main__':
     else:
         ros_repos['building'] = args.build_repo
     # End workarounds
+
+    if args.arches is None:
+        if args.platform == 'fedora':
+            args.arches = ['armhfp', 'i386', 'x86_64']
+        else:
+            args.arches = ['i386', 'amd64']
 
     if args.platform == 'fedora':
         if 'amd64' in args.arches:
