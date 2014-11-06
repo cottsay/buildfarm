@@ -292,6 +292,11 @@ if __name__ == '__main__':
             args.arches.append('x86_64',)
         # End Workaround
 
+        # TODO Another Fedora Arch Workaround
+        if args.platform == 'fedora' and args.rosdistro == 'indigo':
+            args.arches.append('armhfp')
+        # End Workaround
+
         # TODO does only work with one build file
         sourcepkg_timeout = rd._build_files[0].jenkins_sourcedeb_job_timeout
         binarypkg_timeout = rd._build_files[0].jenkins_binarydeb_job_timeout

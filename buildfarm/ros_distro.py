@@ -64,9 +64,9 @@ class Rosdistro:
                 self._repoinfo[name].packages[pkg_name] = pkg.subfolder
                 self._package_in_repo[pkg_name] = name
 
-    def get_arches(self):
+    def get_arches(self, os_name='ubuntu'):
         arches = []
-        for os_name in self._build_files[0].get_target_os_names():
+        if os_name in self._build_files[0].get_target_os_names():
             for os_code_name in self._build_files[0].get_target_os_code_names(os_name):
                 for arch in self._build_files[0].get_target_arches(os_name, os_code_name):
                     if arch not in arches:
