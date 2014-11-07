@@ -130,6 +130,7 @@ def doit(rd, distros, arches, target_repository, fqdn, jobs_graph, rosdistro, pa
         # TODO: Workaround until repos have rpm branches
         manual_workarounds = []
         if rosdistro == 'indigo':
+            manual_workarounds += ['bride'] # Missing build ids
             manual_workarounds += ['gazebo_ros_pkgs'] # https://github.com/ros-simulation/gazebo_ros_pkgs/pull/244
             # manual_workarounds += ['jsk_common'] # https://github.com/jsk-ros-pkg/jsk_common/pull/565
             manual_workarounds += ['jsk_roseus'] # Bad packaging practices
@@ -144,6 +145,7 @@ def doit(rd, distros, arches, target_repository, fqdn, jobs_graph, rosdistro, pa
             manual_workarounds += ['uwsim_bullet'] # https://github.com/uji-ros-pkg/uwsim_bullet/pull/1
             manual_workarounds += ['warehouse_ros'] # https://github.com/ros-planning/warehouse_ros/pull/17
         elif rosdistro == 'hydro':
+            manual_workarounds += ['bride'] # Missing build ids
             manual_workarounds += ['cob_driver'] # TODO
             manual_workarounds += ['jsk_common'] # release of 1.0.50
             manual_workarounds += ['jsk_control'] # Differing bloom versions
