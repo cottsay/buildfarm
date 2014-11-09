@@ -134,6 +134,7 @@ def doit(rd, distros, arches, target_repository, fqdn, jobs_graph, rosdistro, pa
             manual_workarounds += ['gazebo_ros_pkgs'] # https://github.com/ros-simulation/gazebo_ros_pkgs/pull/244
             manual_workarounds += ['jsk_roseus'] # Bad packaging practices
             manual_workarounds += ['libpointmatcher'] # TODO: Not sure how to phrase this one yet
+            manual_workarounds += ['multisense_ros'] # https://bitbucket.org/crl/multisense_ros/pull-request/5
             manual_workarounds += ['neo_driver'] # https://github.com/neobotix/neo_driver/pull/3
             manual_workarounds += ['openni2_camera'] # valid branch has wrong rosdep entry for openni2-devel
             manual_workarounds += ['openrtm_aist'] # https://github.com/ros-infrastructure/bloom/pull/318
@@ -146,6 +147,7 @@ def doit(rd, distros, arches, target_repository, fqdn, jobs_graph, rosdistro, pa
             manual_workarounds += ['cob_driver'] # TODO
             manual_workarounds += ['jsk_control'] # Differing bloom versions
             manual_workarounds += ['jsk_roseus'] # Bad packaging practices
+            manual_workarounds += ['multisense_ros'] # https://bitbucket.org/crl/multisense_ros/pull-request/5
             manual_workarounds += ['openni2_camera'] # valid branch has wrong rosdep entry for openni2-devel
             manual_workarounds += ['robot_model'] # TODO: Testing
             manual_workarounds += ['shadow_robot'] # Gazebo link directory issue
