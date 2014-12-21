@@ -153,8 +153,8 @@ def doit(rd, distros, arches, target_repository, fqdn, jobs_graph, rosdistro, pa
             manual_workarounds += ['shadow_robot'] # Gazebo link directory issue
             manual_workarounds += ['warehouse_ros'] # https://github.com/ros-planning/warehouse_ros/pull/17
         import re
-        expected_tag = 'rpm/%s-%s_%s' % (rd.debianize_package_name(r.packages.keys()[0]), r.full_version, target_distros[0])
-        if r.name in manual_workarounds or not verify_tags(r.url, expected_tag):
+        expected_tags = ['rpm/%s-%s_%s' % (rd.debianize_package_name(r.packages.keys()[0]), r.full_version, target_distro) for target_distro in target_distros]
+        if r.name in manual_workarounds or None in [verify_tags(r.url, expected_tag) for expected_tag in expected_tags]:
             re_url = re.match('(http|https|git|ssh)://(git@)?github\.com[:/]([^/]*)/(.*)', r.url)
             if not re_url:
                 print('- failed to parse URL: %s' % r.url)
