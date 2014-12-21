@@ -26,12 +26,20 @@ def parse_options():
                         help='A list of repository (or stack) names to create. Default: forks all')
     parser.add_argument('--delete-existing-workaround', action='store_true', default=False,
                         help='Deletes the existing workaround repo and do nothing else')
+    parser.add_argument('--release', default=None,
+                        help='Fedora release to check and generate for. Default: \'all\' mode')
 
     args = parser.parse_args()
     return args
 
-def verify_branch(repo, rosdistro=None):
-    expected_branch = 'rpm/' if not rosdistro else 'rpm/%s/' % (rosdistro,)
+def verify_branch(repo, rosdistro=None, fver=None):
+    if fver:
+        if rosdistro:
+            expected_branch = 'rpm/%s/%s/' % (rosdistro, fver)
+        else:
+            return False
+    else:
+        expected_branch = 'rpm/' if not rosdistro else 'rpm/%s/' % (rosdistro,)
     for b in repo.get_branches():
         if b.name.startswith(expected_branch):
             return True
@@ -97,8 +105,11 @@ if __name__ == '__main__':
             print('done')
 
         # Check real repo for an RPM branch in our rosdistro
-        if verify_branch(real_repo, args.rosdistro) and not args.delete_existing_workaround:
-            print('- already has valid release repo')
+        if verify_branch(real_repo, args.rosdistro, args.release) and not args.delete_existing_workaround:
+            if args.release:
+                print('- already has valid release repo for %s' % (args.release,))
+            else:
+                print('- already has valid release repo')
             continue
 
         # Check for a workaround repo
@@ -128,7 +139,7 @@ if __name__ == '__main__':
                 sleep(2.0)
                 print('done')
 
-        if verify_branch(gh_org_repos[real_name], args.rosdistro):
+        if verify_branch(gh_org_repos[real_name], args.rosdistro, args.release):
             print('- already has valid workaround repo')
             continue
 
@@ -139,9 +150,14 @@ if __name__ == '__main__':
             subprocess.check_call(['git', 'clone', '--quiet', gh_org_repos[real_name].ssh_url, temp_dir])
             print('done')
 
-            sys.stdout.write('- generating RPM branch...')
-            sys.stdout.flush()
-            subprocess.check_call('cd %s && git-bloom-generate -y rosrpm --prefix release/%s %s --unsafe -i %s >> /dev/null' % (temp_dir, args.rosdistro, args.rosdistro, real_rel), shell=True)
+            if args.release:
+                sys.stdout.write('- generating RPM branch for %s...' % (args.release,))
+                sys.stdout.flush()
+                subprocess.check_call('cd %s && git-bloom-generate -y rosrpm --prefix release/%s %s --unsafe -i %s --distros %s >> /dev/null' % (temp_dir, args.rosdistro, args.rosdistro, real_rel, args.release), shell=True)
+            else:
+                sys.stdout.write('- generating RPM branch...')
+                sys.stdout.flush()
+                subprocess.check_call('cd %s && git-bloom-generate -y rosrpm --prefix release/%s %s --unsafe -i %s >> /dev/null' % (temp_dir, args.rosdistro, args.rosdistro, real_rel), shell=True)
             print('done')
 
             sys.stdout.write('- pushing back to GitHub...')
