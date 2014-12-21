@@ -131,6 +131,7 @@ def doit(rd, distros, arches, target_repository, fqdn, jobs_graph, rosdistro, pa
         manual_workarounds = []
         if rosdistro == 'indigo':
             manual_workarounds += ['bride'] # Missing build ids
+            manual_workarounds += ['class_loader'] # https://github.com/ros/class_loader/pull/23
             manual_workarounds += ['gazebo_ros_pkgs'] # https://github.com/ros-simulation/gazebo_ros_pkgs/pull/244
             manual_workarounds += ['jsk_roseus'] # Bad packaging practices
             manual_workarounds += ['libpointmatcher'] # TODO: Not sure how to phrase this one yet
