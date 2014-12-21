@@ -134,6 +134,7 @@ def doit(rd, distros, arches, target_repository, fqdn, jobs_graph, rosdistro, pa
             manual_workarounds += ['class_loader'] # https://github.com/ros/class_loader/pull/23
             manual_workarounds += ['gazebo_ros_pkgs'] # https://github.com/ros-simulation/gazebo_ros_pkgs/pull/244
             manual_workarounds += ['jsk_roseus'] # Bad packaging practices
+            manual_workarounds += ['libnabo'] # -DSHARED_LIBS:BOOL=ON (no official rpm branch yet)
             manual_workarounds += ['libpointmatcher'] # TODO: Not sure how to phrase this one yet
             manual_workarounds += ['multisense_ros'] # https://bitbucket.org/crl/multisense_ros/pull-request/5
             manual_workarounds += ['neo_driver'] # https://github.com/neobotix/neo_driver/pull/3
