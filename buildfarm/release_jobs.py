@@ -17,7 +17,7 @@ from rospkg.distro import load_distro, distro_uri
 from ros_distro import debianize_package_name, get_index_url
 
 from . import repo, jenkins_support
-from .fedora_vmap import fedora_ver
+from .fedora_vmap import get_fedora_ver
 
 import jenkins
 
@@ -45,7 +45,7 @@ def expand(config_template, d):
 
 def get_full_version(version, distro, platform):
     if platform == 'fedora':
-        return str(version) + '.fc' + str(fedora_ver[distro])
+        return str(version) + '.fc' + str(get_fedora_ver(distro))
     else:
         return str(version) + distro
 
@@ -298,7 +298,7 @@ def create_binarydeb_config(d):
 
 def create_binaryrpm_config(d):
     d['TIMESTAMP'] = datetime.datetime.now()
-    d['DISTRO_VER'] = fedora_ver[d['DISTRO']]
+    d['DISTRO_VER'] = get_fedora_ver(d['DISTRO'])
     d['COMMAND'] = escape(expand(Templates.command_binaryrpm, d))
     return expand(Templates.config_binaryrpm, d)
 

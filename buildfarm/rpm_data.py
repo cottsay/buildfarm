@@ -16,7 +16,7 @@ from distutils.version import LooseVersion
 from rospkg.distro import distro_uri
 from apt_data import RosdistroVersion, load_url
 
-from fedora_vmap import fedora_ver
+from fedora_vmap import get_fedora_ver
 
 from rpminfo import read_repository
 
@@ -29,16 +29,15 @@ def get_version_data(rootdir, rosdistro_name, ros_repos, distro_arches, update_c
     for repo_type in ros_repos:
         for d in set([d for (d, a) in distro_arches]):
             # download list of source packages
-            da_str = "SRPMS/%s" % fedora_ver[d]
-            url = os.path.join(ros_repos[repo_type], 'linux/%s/SRPMS' % fedora_ver[d])
+            url = os.path.join(ros_repos[repo_type], 'linux/%s/SRPMS' % get_fedora_ver(d))
             pkgs = read_repository(url)
             # extract information
             rpm_data.fill_versions(repo_type, d, 'source', pkgs)
 
         for (d, a) in distro_arches:
             # download list of binary packages
-            da_str = "%s/%s" % (a, fedora_ver[d])
-            url = os.path.join(ros_repos[repo_type], 'linux/%s/%s' % (fedora_ver[d], a))
+            da_str = "%s/%s" % (a, get_fedora_ver(d))
+            url = os.path.join(ros_repos[repo_type], 'linux/%s/%s' % (get_fedora_ver(d), a))
             pkgs = read_repository(url)
             # extract information
             rpm_data.fill_versions(repo_type, d, a, pkgs)

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 from __future__ import print_function
-from buildfarm.fedora_vmap import fedora_ver
+from buildfarm.fedora_vmap import get_fedora_ver
 from buildfarm.mock_root import check_mock_config, get_default_confdir
 import os
 from platform import machine
@@ -63,9 +63,9 @@ def verify_rpm_tag(repo_uri, package_name, package_version, distro):
 
 def build_source_rpm(repo_uri, tag, packagename, distro, output, base_mock_cfg):
     check_mock_config(distro, 'src', True, True, get_default_confdir(), [], base=base_mock_cfg)
-    # call(None, ('mock', '--quiet', '--configdir', get_default_confdir(), '--root',  'fedora-' + str(fedora_ver[distro]) + '-' + machine() + '-rossrc', '--buildsrpm', '--resultdir', output, '--scm-enable', '--scm-option', 'git_get=git clone ' + repo_uri + ' ' + packagename, '--scm-option', 'package=' + packagename, '--scm-option', 'branch=' + tag, '--scm-option', 'write_tar=True', '--scm-option', 'spec=rpm/' + packagename + '.spec'))
+    # call(None, ('mock', '--quiet', '--configdir', get_default_confdir(), '--root',  'fedora-' + str(get_fedora_ver(distro)) + '-' + machine() + '-rossrc', '--buildsrpm', '--resultdir', output, '--scm-enable', '--scm-option', 'git_get=git clone ' + repo_uri + ' ' + packagename, '--scm-option', 'package=' + packagename, '--scm-option', 'branch=' + tag, '--scm-option', 'write_tar=True', '--scm-option', 'spec=rpm/' + packagename + '.spec'))
     # Temporary workaround for ros-infrastructure/bloom#295
-    call(None, ('mock', '--quiet', '--configdir', get_default_confdir(), '--root',  'fedora-' + str(fedora_ver[distro]) + '-' + machine() + '-rossrc', '--buildsrpm', '--resultdir', output, '--scm-enable', '--scm-option', 'git_get=bash -c "git clone ' + repo_uri + ' ' + packagename + ' && cd ' + packagename + ' && git checkout ' + tag + ' && awk \\"/%changelog/ {exit} {print}\\" rpm/*.spec > rpm/tmp && mv -f rpm/tmp rpm/*.spec"', '--scm-option', 'package=' + packagename, '--scm-option', 'branch=' + tag, '--scm-option', 'write_tar=True', '--scm-option', 'spec=rpm/' + packagename + '.spec'))
+    call(None, ('mock', '--quiet', '--configdir', get_default_confdir(), '--root',  'fedora-' + str(get_fedora_ver(distro)) + '-' + machine() + '-rossrc', '--buildsrpm', '--resultdir', output, '--scm-enable', '--scm-option', 'git_get=bash -c "git clone ' + repo_uri + ' ' + packagename + ' && cd ' + packagename + ' && git checkout ' + tag + ' && awk \\"/%changelog/ {exit} {print}\\" rpm/*.spec > rpm/tmp && mv -f rpm/tmp rpm/*.spec"', '--scm-option', 'package=' + packagename, '--scm-option', 'branch=' + tag, '--scm-option', 'write_tar=True', '--scm-option', 'spec=rpm/' + packagename + '.spec'))
     print("Successfully created changes in %s" % output)
     call(None, ['ls', output])
 
@@ -78,7 +78,7 @@ def upload_source_rpm(distros, repo_fqdn, input_directory, packagename):
     # Copy up the data
     for distro in distros:
         upload_source = os.path.join(input_directory, distro, 'SRPMS')
-        distro_upload_root = os.path.join(upload_root, str(fedora_ver[distro]))
+        distro_upload_root = os.path.join(upload_root, str(get_fedora_ver(distro)))
         da_upload_root = os.path.join(distro_upload_root, 'SRPMS')
         # clear the upload directory to make sure that there are not old files lying around
         cmd = ("ssh rosbuild@%s -- rm -rf %s" % (repo_fqdn, da_upload_root)).split()

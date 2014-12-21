@@ -5,7 +5,7 @@ import getopt
 import os
 from pkg_resources import resource_string
 from platform import machine
-from .fedora_vmap import fedora_ver
+from .fedora_vmap import get_fedora_ver
 import sys
 
 repos = {
@@ -19,7 +19,7 @@ def get_default_confdir():
 
 def check_mock_config(distro, arch=machine(), use_ramdisk=True, quiet=False, output_dir=get_default_confdir(), repos=repos, base=None):
     # General Stuff
-    distro = fedora_ver[distro]
+    distro = get_fedora_ver(distro)
     mock_dir = os.path.normpath('/etc/mock')
     if not os.path.isdir(output_dir):
         os.mkdir(output_dir)

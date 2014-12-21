@@ -44,7 +44,7 @@ import tempfile
 import shutil
 import gzip
 from . import rpminfo
-from .fedora_vmap import fedora_ver
+from .fedora_vmap import get_fedora_ver
 
 #from .core import debianize_name
 
@@ -230,7 +230,7 @@ def pkg_in_repo(repo_url, pkg_name, pkg_version, os_distro, arch, use_regex=True
         return deb_in_repo(repo_url, pkg_name, pkg_version, os_distro, arch, use_regex, cache, source)
 
 def rpm_in_repo(repo_url, pkg_name, pkg_version, os_distro, arch, cache=None):
-    fver = str(fedora_ver[os_distro])
+    fver = str(get_fedora_ver(os_distro))
     repo_path = os.path.join(repo_url, 'linux', fver, arch)
     version, release = pkg_version.split('-')
     if cache is None:
