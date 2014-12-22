@@ -130,9 +130,11 @@ def doit(rd, distros, arches, target_repository, fqdn, jobs_graph, rosdistro, pa
         # TODO: Workaround until repos have rpm branches
         manual_workarounds = []
         if rosdistro == 'indigo':
+            manual_workarounds += ['ardrone_autonomy'] # https://github.com/AutonomyLab/ardronelib/pull/1
             manual_workarounds += ['bride'] # Missing build ids
             manual_workarounds += ['class_loader'] # https://github.com/ros/class_loader/pull/23
             manual_workarounds += ['gazebo_ros_pkgs'] # https://github.com/ros-simulation/gazebo_ros_pkgs/pull/244
+            manual_workarounds += ['joystick_drivers'] # https://github.com/ros-drivers/joystick_drivers/pull/66
             manual_workarounds += ['jsk_roseus'] # Bad packaging practices
             manual_workarounds += ['libnabo'] # -DSHARED_LIBS:BOOL=ON (no official rpm branch yet)
             manual_workarounds += ['libpointmatcher'] # TODO: Not sure how to phrase this one yet
