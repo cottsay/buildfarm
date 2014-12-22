@@ -139,7 +139,6 @@ def doit(rd, distros, arches, target_repository, fqdn, jobs_graph, rosdistro, pa
             manual_workarounds += ['multisense_ros'] # https://bitbucket.org/crl/multisense_ros/pull-request/5
             manual_workarounds += ['neo_driver'] # https://github.com/neobotix/neo_driver/pull/3
             manual_workarounds += ['openni2_camera'] # valid branch has wrong rosdep entry for openni2-devel
-            manual_workarounds += ['openrtm_aist'] # https://github.com/ros-infrastructure/bloom/pull/318
             # manual_workarounds += ['rqt_graphprofiler'] # https://github.com/osrf/rqt_graphprofiler/pull/28
             manual_workarounds += ['srv_tools'] # https://github.com/srv/srv_tools/pull/3
             manual_workarounds += ['uwsim_bullet'] # https://github.com/uji-ros-pkg/uwsim_bullet/pull/1
