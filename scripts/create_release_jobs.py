@@ -133,7 +133,6 @@ def doit(rd, distros, arches, target_repository, fqdn, jobs_graph, rosdistro, pa
             manual_workarounds += ['ardrone_autonomy'] # https://github.com/AutonomyLab/ardronelib/pull/1
             manual_workarounds += ['bride'] # Missing build ids
             manual_workarounds += ['catkin'] # https://github.com/ros/catkin/issues/702
-            manual_workarounds += ['class_loader'] # https://github.com/ros/class_loader/pull/23
             manual_workarounds += ['diagnostics'] # https://github.com/ros/diagnostics/pull/38
             manual_workarounds += ['gazebo_ros_pkgs'] # https://github.com/ros-simulation/gazebo_ros_pkgs/pull/244
             manual_workarounds += ['joystick_drivers'] # https://github.com/ros-drivers/joystick_drivers/pull/66
