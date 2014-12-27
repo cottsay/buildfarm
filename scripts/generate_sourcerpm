@@ -118,8 +118,12 @@ if __name__ == "__main__":
     package_version = rd.get_version(args.short_package_name, full_version=True)
     print("package name", args.short_package_name, "version", package_version)
 
+    distros = rd.get_target_distros()['fedora']
+    if '22' in distros:
+        distros.remove('22')
+
     report_failure = False
-    for d in rd.get_target_distros()['fedora']:
+    for d in distros:
 
         tag = verify_rpm_tag(args.repo_uri, args.package_name, package_version, d)
         if not tag:
@@ -142,7 +146,7 @@ if __name__ == "__main__":
         if args.noupload:
             print("Noupload argument passed, skipping upload of %s" % args.output)
         else:
-            upload_source_rpm(rd.get_target_distros()['fedora'], args.repo_fqdn,
+            upload_source_rpm(distros, args.repo_fqdn,
                               args.output,
                               args.package_name
                               )
