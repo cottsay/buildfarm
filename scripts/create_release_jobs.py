@@ -300,7 +300,7 @@ if __name__ == '__main__':
         # End Workaround
 
         # TODO Another Fedora Arch Workaround
-        if args.platform == 'fedora' and args.rosdistro == 'indigo':
+        if args.platform == 'fedora' and args.rosdistro in ['indigo', 'jade']:
             args.arches.append('armhfp')
         # End Workaround
 
