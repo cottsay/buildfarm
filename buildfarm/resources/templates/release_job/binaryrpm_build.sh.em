@@ -8,6 +8,10 @@ DISTRO_VER=@(DISTRO_VER)
 ARCH=@(ARCH)
 RET=0
 
+if [ "$YUM_CONF_PATH" == "" ]; then
+	YUM_CONF_PATH=/etc/yum.conf
+fi
+
 # When mock uses tmpfs for builds, it sometimes doesn't dismount properly.
 # There are other scenarios where dismounting doesn't happen, such as an
 # aborted build. This will ensure that the tmpfs isn't mounted.
@@ -52,7 +56,7 @@ if [ $RET -ne 0 ]; then
   exit $RET
 fi
 
-/usr/bin/mock --quiet --configdir $MOCK_CONF_DIR --root fedora-$DISTRO_VER-$ARCH-ros --resultdir $WORKSPACE/output --copyout /etc/yum.conf $WORKSPACE/workspace/
+/usr/bin/mock --quiet --configdir $MOCK_CONF_DIR --root fedora-$DISTRO_VER-$ARCH-ros --resultdir $WORKSPACE/output --copyout $YUM_CONF_PATH $WORKSPACE/workspace/
 
 # Pull the sourcerpm
 yumdownloader --quiet --disablerepo="*" --enablerepo=building --source --config $WORKSPACE/workspace/yum.conf --destdir $WORKSPACE/workspace --setopt=keepcache=0 --setopt=metadata_expire=0 --releasever=$DISTRO_VER $PACKAGE
