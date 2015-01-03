@@ -148,7 +148,6 @@ def doit(rd, distros, arches, target_repository, fqdn, jobs_graph, rosdistro, pa
             manual_workarounds += ['openni2_camera'] # valid branch has wrong rosdep entry for openni2-devel
             manual_workarounds += ['razer_hydra'] # udev rules...
             manual_workarounds += ['rosauth'] # https://github.com/WPI-RAIL/rosauth/pull/5
-            # manual_workarounds += ['rqt_graphprofiler'] # https://github.com/osrf/rqt_graphprofiler/pull/28
             manual_workarounds += ['srv_tools'] # https://github.com/srv/srv_tools/pull/3
             manual_workarounds += ['uwsim_bullet'] # https://github.com/uji-ros-pkg/uwsim_bullet/pull/1
             manual_workarounds += ['warehouse_ros'] # https://github.com/ros-planning/warehouse_ros/pull/17
