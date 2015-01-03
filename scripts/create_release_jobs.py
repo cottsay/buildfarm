@@ -135,7 +135,7 @@ def doit(rd, distros, arches, target_repository, fqdn, jobs_graph, rosdistro, pa
             manual_workarounds += ['ardrone_autonomy'] # https://github.com/AutonomyLab/ardronelib/pull/1
             manual_workarounds += ['bride'] # Missing build ids
             manual_workarounds += ['diagnostics'] # https://github.com/ros/diagnostics/pull/38
-            manual_workarounds += ['euslisp'] # missing build ids
+            manual_workarounds += ['euslisp'] # missing build ids, also https://github.com/tork-a/euslisp-release/issues/1
             manual_workarounds += ['gazebo_ros_pkgs'] # https://github.com/ros-simulation/gazebo_ros_pkgs/pull/244
             manual_workarounds += ['jsk_common'] # https://github.com/jsk-ros-pkg/jsk_common/issues/649
             manual_workarounds += ['joystick_drivers'] # https://github.com/ros-drivers/joystick_drivers/pull/66
