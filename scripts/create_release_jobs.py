@@ -143,7 +143,6 @@ def doit(rd, distros, arches, target_repository, fqdn, jobs_graph, rosdistro, pa
             manual_workarounds += ['libnabo'] # -DSHARED_LIBS:BOOL=ON (no official rpm branch yet)
             manual_workarounds += ['libpointmatcher'] # TODO: Not sure how to phrase this one yet
             manual_workarounds += ['librms'] # https://github.com/ros/rosdistro/pull/6619
-            manual_workarounds += ['multisense_ros'] # https://bitbucket.org/crl/multisense_ros/pull-request/5
             manual_workarounds += ['neo_driver'] # https://github.com/neobotix/neo_driver/pull/3
             manual_workarounds += ['openni2_camera'] # valid branch has wrong rosdep entry for openni2-devel
             manual_workarounds += ['razer_hydra'] # udev rules...
