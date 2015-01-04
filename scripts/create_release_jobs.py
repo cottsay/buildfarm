@@ -129,8 +129,6 @@ def doit(rd, distros, arches, target_repository, fqdn, jobs_graph, rosdistro, pa
 
         # TODO: Workaround until repos have rpm branches
         manual_workarounds = []
-        if rosdistro == 'jade':
-            manual_workarounds += ['ecto_opencv'] # https://github.com/plasmodic/ecto_opencv/pull/29
         if rosdistro == 'indigo':
             manual_workarounds += ['ardrone_autonomy'] # https://github.com/AutonomyLab/ardronelib/pull/1
             manual_workarounds += ['bride'] # Missing build ids
