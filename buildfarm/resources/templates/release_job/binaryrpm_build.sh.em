@@ -8,9 +8,8 @@ DISTRO_VER=@(DISTRO_VER)
 ARCH=@(ARCH)
 RET=0
 
-if [ "$YUM_CONF_PATH" == "" ]; then
-	YUM_CONF_PATH=/etc/yum.conf
-fi
+
+YUM_CONF_PATH=$(python -c "from distutils.version import LooseVersion as V;print('/etc/yum/yum.conf' if V('`mock --version`') >= V('1.2.0') else '/etc/yum.conf')")
 
 # When mock uses tmpfs for builds, it sometimes doesn't dismount properly.
 # There are other scenarios where dismounting doesn't happen, such as an
