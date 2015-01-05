@@ -198,8 +198,8 @@ if (manager.logContains(".*hudson.plugins.git.GitException: Could not clone.*"))
 	reschedule_build("Yum database failure")
 } else if (manager.logContains(".*Metadata file does not match checksum.*")) {
 	reschedule_build("Yum database failure")
-} else if (manager.logContains(".*\\[Errno 2\\] No such file or directory.*")) {
-	reschedule_build("Yum database failure")
+//} else if (manager.logContains(".*\\[Errno 2\\] No such file or directory.*")) {
+//	reschedule_build("Yum database failure")
 } else if (manager.logContains(".*building-source: Check uncompressed DB failed.*")) {
 	reschedule_build("Yum database failure during source RPM download")
 } else if (manager.logContains(".*\\[Errno 16\\] error setting timestamp on file.*")) {
@@ -216,6 +216,8 @@ if (manager.logContains(".*hudson.plugins.git.GitException: Could not clone.*"))
 	reschedule_build("SSH communication failure")
 } else if (manager.logContains(".*Error: Error reading from file .*\\.sqlite\\.bz2: invalid data stream")) {
 	reschedule_build("SQLite database failure")
+} else if (manager.logContains("ERROR: Build root is locked by another process\\.")) {
+	reschedule_build("Build root is locked")
 } else if (manager.logContains("error: Architecture is not included:.*")) {
         abort_build("This package does not support the given architecture")
 }
