@@ -222,7 +222,7 @@ if (manager.logContains(".*hudson.plugins.git.GitException: Could not clone.*"))
         abort_build("This package does not support the given architecture")
 }
 </groovyScript>
-      <behavior>0</behavior>
+      <behavior>1</behavior>
     </org.jvnet.hudson.plugins.groovypostbuild.GroovyPostbuildRecorder>
     <org.jvnet.hudson.plugins.groovypostbuild.GroovyPostbuildRecorder plugin="groovy-postbuild@@1.8">
       <groovyScript>
@@ -336,7 +336,7 @@ if (mark_unstable) {
 	}
 }
 </groovyScript>
-      <behavior>0</behavior>
+      <behavior>1</behavior>
     </org.jvnet.hudson.plugins.groovypostbuild.GroovyPostbuildRecorder>
     <hudson.tasks.BuildTrigger>
       <childProjects>@(', '.join(CHILD_PROJECTS))</childProjects>

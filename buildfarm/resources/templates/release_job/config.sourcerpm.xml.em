@@ -110,7 +110,7 @@ if (manager.logContains(".*hudson.plugins.git.GitException: Could not clone.*"))
 	reschedule_build("SSH communication failure")
 }
 </groovyScript>
-      <behavior>0</behavior>
+      <behavior>1</behavior>
     </org.jvnet.hudson.plugins.groovypostbuild.GroovyPostbuildRecorder>
     <hudson.tasks.BuildTrigger>
       <childProjects>@(', '.join(CHILD_PROJECTS))</childProjects>
