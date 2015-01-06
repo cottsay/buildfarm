@@ -56,8 +56,7 @@
   <builders>
     <hudson.plugins.groovy.SystemGroovy plugin="groovy@@1.12">
       <scriptSource class="hudson.plugins.groovy.StringScriptSource">
-        <command>
-// VERFIY THAT NO UPSTREAM PROJECT IS BROKEN
+        <command>// VERFIY THAT NO UPSTREAM PROJECT IS BROKEN
 import hudson.model.Result
 
 println ""
@@ -109,8 +108,7 @@ println ""
     </hudson.tasks.Shell>
     <hudson.plugins.groovy.SystemGroovy plugin="groovy@@1.12">
       <scriptSource class="hudson.plugins.groovy.StringScriptSource">
-        <command>
-// CHECK FOR "HASH SUM MISMATCH" AND RETRIGGER JOB
+        <command>// CHECK FOR "HASH SUM MISMATCH" AND RETRIGGER JOB
 // only triggered when previous build step was successful
 import java.io.BufferedReader
 import java.util.regex.Matcher
@@ -158,9 +156,9 @@ println ""
     </hudson.plugins.groovy.SystemGroovy>
   </builders>
   <publishers>
-    <org.jvnet.hudson.plugins.groovypostbuild.GroovyPostbuildRecorder plugin="groovy-postbuild@@1.8">
-      <groovyScript>
-// CHECK FOR VARIOUS REASONS TO RETRIGGER JOB
+    <org.jvnet.hudson.plugins.groovypostbuild.GroovyPostbuildRecorder plugin="groovy-postbuild@@2.2">
+      <script plugin="script-security@@1.12">
+        <script>// CHECK FOR VARIOUS REASONS TO RETRIGGER JOB
 // also triggered when a build step has failed
 import hudson.model.Cause
 import hudson.model.Result
@@ -221,12 +219,14 @@ if (manager.logContains(".*hudson.plugins.git.GitException: Could not clone.*"))
 } else if (manager.logContains("error: Architecture is not included:.*")) {
         abort_build("This package does not support the given architecture")
 }
-</groovyScript>
+</script>
+        <sandbox>true</sandbox>
+      </script>
       <behavior>1</behavior>
     </org.jvnet.hudson.plugins.groovypostbuild.GroovyPostbuildRecorder>
-    <org.jvnet.hudson.plugins.groovypostbuild.GroovyPostbuildRecorder plugin="groovy-postbuild@@1.8">
-      <groovyScript>
-import java.io.BufferedReader
+    <org.jvnet.hudson.plugins.groovypostbuild.GroovyPostbuildRecorder plugin="groovy-postbuild@@2.2">
+      <script plugin="script-security@@1.12">
+        <script>import java.io.BufferedReader
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
@@ -335,7 +335,9 @@ if (mark_unstable) {
 		manager.build.setResult(Result.UNSTABLE)
 	}
 }
-</groovyScript>
+</script>
+        <sandbox>true</sandbox>
+      </script>
       <behavior>1</behavior>
     </org.jvnet.hudson.plugins.groovypostbuild.GroovyPostbuildRecorder>
     <hudson.tasks.BuildTrigger>

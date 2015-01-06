@@ -60,9 +60,9 @@
     </hudson.tasks.Shell>
   </builders>
   <publishers>
-    <org.jvnet.hudson.plugins.groovypostbuild.GroovyPostbuildRecorder plugin="groovy-postbuild@@1.8">
-      <groovyScript>
-// CHECK FOR VARIOUS REASONS TO RETRIGGER JOB
+    <org.jvnet.hudson.plugins.groovypostbuild.GroovyPostbuildRecorder plugin="groovy-postbuild@@2.2">
+      <script plugin="script-security@@1.12">
+        <script>// CHECK FOR VARIOUS REASONS TO RETRIGGER JOB
 // also triggered when a build step has failed
 import hudson.model.Cause
 import org.jvnet.hudson.plugins.groovypostbuild.GroovyPostbuildAction
@@ -109,7 +109,9 @@ if (manager.logContains(".*hudson.plugins.git.GitException: Could not clone.*"))
 } else if (manager.logContains("ssh_exchange_identification: Connection closed by remote host")) {
 	reschedule_build("SSH communication failure")
 }
-</groovyScript>
+</script>
+        <sandbox>true</sandbox>
+      </script>
       <behavior>1</behavior>
     </org.jvnet.hudson.plugins.groovypostbuild.GroovyPostbuildRecorder>
     <hudson.tasks.BuildTrigger>
