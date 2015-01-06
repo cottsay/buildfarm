@@ -113,11 +113,12 @@ if (manager.logContains(".*hudson.plugins.git.GitException: Could not clone.*"))
       <behavior>0</behavior>
     </org.jvnet.hudson.plugins.groovypostbuild.GroovyPostbuildRecorder>
     <hudson.tasks.BuildTrigger>
-      <childProjects>@(','.join(CHILD_PROJECTS))</childProjects>
+      <childProjects>@(', '.join(CHILD_PROJECTS))</childProjects>
       <threshold>
         <name>SUCCESS</name>
         <ordinal>0</ordinal>
         <color>BLUE</color>
+        <completeBuild>true</completeBuild>
       </threshold>
     </hudson.tasks.BuildTrigger>
     <hudson.plugins.descriptionsetter.DescriptionSetterPublisher>

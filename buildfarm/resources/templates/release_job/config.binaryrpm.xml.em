@@ -339,11 +339,12 @@ if (mark_unstable) {
       <behavior>0</behavior>
     </org.jvnet.hudson.plugins.groovypostbuild.GroovyPostbuildRecorder>
     <hudson.tasks.BuildTrigger>
-      <childProjects>@(','.join(CHILD_PROJECTS))</childProjects>
+      <childProjects>@(', '.join(CHILD_PROJECTS))</childProjects>
       <threshold>
         <name>UNSTABLE</name>
         <ordinal>1</ordinal>
         <color>YELLOW</color>
+        <completeBuild>true</completeBuild>
       </threshold>
     </hudson.tasks.BuildTrigger>
     <hudson.plugins.descriptionsetter.DescriptionSetterPublisher>
