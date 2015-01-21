@@ -137,6 +137,7 @@ def doit(rd, distros, arches, target_repository, fqdn, jobs_graph, rosdistro, pa
             manual_workarounds += ['gazebo_ros_pkgs'] # https://github.com/ros-simulation/gazebo_ros_pkgs/pull/244
             manual_workarounds += ['jsk_common'] # https://github.com/jsk-ros-pkg/jsk_common/issues/649
             manual_workarounds += ['joystick_drivers'] # https://github.com/ros-drivers/joystick_drivers/pull/66
+            manual_workarounds += ['lama_utilities'] # https://github.com/lama-imr/lama_utilities/pull/1
             manual_workarounds += ['libnabo'] # -DSHARED_LIBS:BOOL=ON (no official rpm branch yet)
             manual_workarounds += ['libpointmatcher'] # TODO: Not sure how to phrase this one yet
             manual_workarounds += ['librms'] # https://github.com/ros/rosdistro/pull/6619
