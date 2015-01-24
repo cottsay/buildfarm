@@ -34,7 +34,9 @@ ROS_REPO_FQDN=csc.mcs.sdsmt.edu
 UPSTREAM_REPO_PATH=/mnt/storage/repos/smd-ros-shadow-fixed/fedora/linux
 DOWNSTREAM_REPO_PATH=/mnt/storage/repos/smd-ros/fedora/linux
 
-ssh rosbuild@$ROS_REPO_FQDN -- PYTHONPATH=/home/rosbuild/rpmrepo_updater/src python /home/rosbuild/rpmrepo_updater/scripts/sync_manager.py $UPSTREAM_REPO_PATH $DOWNSTREAM_REPO_PATH --filter=^ros-indigo- --clean --update --commit
+ssh rosbuild@$ROS_REPO_FQDN -- PYTHONPATH=/home/rosbuild/rpmrepo_updater/src python /home/rosbuild/rpmrepo_updater/scripts/sync_manager.py $UPSTREAM_REPO_PATH $DOWNSTREAM_REPO_PATH --filter=^ros-indigo- --clean --update --fast
+
+ssh rosbuild@$ROS_REPO_FQDN -- PYTHONPATH=/home/rosbuild/rpmrepo_updater/src python /home/rosbuild/rpmrepo_updater/scripts/sync_manager.py $UPSTREAM_REPO_PATH $DOWNSTREAM_REPO_PATH --filter=^ros-indigo- --clean --update --fast --commit
       </command>
     </hudson.tasks.Shell>
   </builders>

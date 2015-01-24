@@ -34,11 +34,22 @@ ROS_REPO_FQDN=csc.mcs.sdsmt.edu
 UPSTREAM_REPO_PATH=/mnt/storage/repos/smd-ros-building/fedora/linux
 DOWNSTREAM_REPO_PATH=/mnt/storage/repos/smd-ros-shadow-fixed/fedora/linux
 
-ssh rosbuild@$ROS_REPO_FQDN -- PYTHONPATH=/home/rosbuild/rpmrepo_updater/src python /home/rosbuild/rpmrepo_updater/scripts/sync_manager.py $UPSTREAM_REPO_PATH $DOWNSTREAM_REPO_PATH --filter=^ros-indigo- --clean --update --commit
+ssh rosbuild@$ROS_REPO_FQDN -- PYTHONPATH=/home/rosbuild/rpmrepo_updater/src python /home/rosbuild/rpmrepo_updater/scripts/sync_manager.py $UPSTREAM_REPO_PATH $DOWNSTREAM_REPO_PATH --filter=^ros-indigo- --clean --update --fast
+
+ssh rosbuild@$ROS_REPO_FQDN -- PYTHONPATH=/home/rosbuild/rpmrepo_updater/src python /home/rosbuild/rpmrepo_updater/scripts/sync_manager.py $UPSTREAM_REPO_PATH $DOWNSTREAM_REPO_PATH --filter=^ros-indigo- --clean --update --fast --commit
       </command>
     </hudson.tasks.Shell>
   </builders>
   <publishers>
+    <hudson.tasks.BuildTrigger>
+      <childProjects>_indigo-rosrpm-status</childProjects>
+      <threshold>
+        <name>SUCCESS</name>
+        <ordinal>0</ordinal>
+        <color>BLUE</color>
+        <completeBuild>true</completeBuild>
+      </threshold>
+    </hudson.tasks.BuildTrigger>
     <hudson.tasks.Mailer plugin="mailer@1.12">
       <recipients>logans@cottsay.net</recipients>
       <dontNotifyEveryUnstableBuild>true</dontNotifyEveryUnstableBuild>
