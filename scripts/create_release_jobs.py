@@ -142,6 +142,7 @@ def doit(rd, distros, arches, target_repository, fqdn, jobs_graph, rosdistro, pa
             manual_workarounds += ['librms'] # https://github.com/ros/rosdistro/pull/6619
             manual_workarounds += ['neo_driver'] # https://github.com/neobotix/neo_driver/pull/3
             manual_workarounds += ['ocl'] # https://github.com/ros/rosdistro/pull/6959
+            manual_workarounds += ['openni_camera'] # https://github.com/ros-drivers/openni_camera/pull/32
             manual_workarounds += ['openni2_camera'] # valid branch has wrong rosdep entry for openni2-devel
             manual_workarounds += ['razer_hydra'] # udev rules...
             manual_workarounds += ['rosauth'] # https://github.com/WPI-RAIL/rosauth/pull/5
