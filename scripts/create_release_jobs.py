@@ -140,7 +140,6 @@ def doit(rd, distros, arches, target_repository, fqdn, jobs_graph, rosdistro, pa
             manual_workarounds += ['libnabo'] # -DSHARED_LIBS:BOOL=ON (no official rpm branch yet)
             manual_workarounds += ['libpointmatcher'] # TODO: Not sure how to phrase this one yet
             manual_workarounds += ['librms'] # https://github.com/ros/rosdistro/pull/6619
-            manual_workarounds += ['metaruby'] # https://github.com/orocos-gbp/metaruby-release/pull/1, also https://github.com/orocos-gbp/metaruby-release/pull/2
             manual_workarounds += ['neo_driver'] # https://github.com/neobotix/neo_driver/pull/3
             manual_workarounds += ['ocl'] # https://github.com/ros/rosdistro/pull/6959
             manual_workarounds += ['openni_camera'] # https://github.com/ros-drivers/openni_camera/pull/32
@@ -149,7 +148,6 @@ def doit(rd, distros, arches, target_repository, fqdn, jobs_graph, rosdistro, pa
             manual_workarounds += ['rosauth'] # https://github.com/WPI-RAIL/rosauth/pull/5
             manual_workarounds += ['srv_tools'] # https://github.com/srv/srv_tools/pull/3
             manual_workarounds += ['turtlebot_create_desktop'] # https://github.com/turtlebot/turtlebot_create_desktop/issues/7
-            manual_workarounds += ['utilrb'] # https://github.com/orocos-gbp/utilrb-release/pull/1
             manual_workarounds += ['uwsim_bullet'] # https://github.com/uji-ros-pkg/uwsim_bullet/pull/1
             manual_workarounds += ['warehouse_ros'] # https://github.com/ros-planning/warehouse_ros/pull/17
         elif rosdistro == 'hydro':
