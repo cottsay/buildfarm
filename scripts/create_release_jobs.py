@@ -129,7 +129,9 @@ def doit(rd, distros, arches, target_repository, fqdn, jobs_graph, rosdistro, pa
 
         # TODO: Workaround until repos have rpm branches
         manual_workarounds = []
-        if rosdistro == 'indigo':
+        if rosdistro == 'jade':
+            manual_workarounds += ['ueye_cam']
+        elif rosdistro == 'indigo':
             manual_workarounds += ['ardrone_autonomy'] # https://github.com/AutonomyLab/ardronelib/pull/1
             manual_workarounds += ['bride'] # Missing build ids
             manual_workarounds += ['care_o_bot'] # https://github.com/ipa320/care-o-bot/issues/5
@@ -160,8 +162,6 @@ def doit(rd, distros, arches, target_repository, fqdn, jobs_graph, rosdistro, pa
             manual_workarounds += ['robot_model'] # TODO: Testing
             manual_workarounds += ['shadow_robot'] # Gazebo link directory issue
             manual_workarounds += ['warehouse_ros'] # https://github.com/ros-planning/warehouse_ros/pull/17
-        elif rosdistro == 'jade':
-            manual_workarounds += ['ueye_cam']
         import re
         expected_tags = ['rpm/%s-%s_%s' % (rd.debianize_package_name(r.packages.keys()[0]), r.full_version, target_distro) for target_distro in target_distros]
         if r.name in manual_workarounds or None in [verify_tags(r.url, expected_tag) for expected_tag in expected_tags]:
