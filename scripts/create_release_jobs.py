@@ -130,13 +130,14 @@ def doit(rd, distros, arches, target_repository, fqdn, jobs_graph, rosdistro, pa
         # TODO: Workaround until repos have rpm branches
         manual_workarounds = []
         if rosdistro == 'jade':
+            manual_workarounds += ['euslisp'] # https://github.com/tork-a/euslisp-release/pull/4
             manual_workarounds += ['ueye_cam'] # https://github.com/anqixu/ueye_cam/pull/16
             # manual_workarounds += ['bfl'] # https://github.com/ros-gbp/bfl-release/pull/9
         elif rosdistro == 'indigo':
             manual_workarounds += ['ardrone_autonomy'] # https://github.com/AutonomyLab/ardronelib/pull/1
             manual_workarounds += ['bride'] # Missing build ids
             manual_workarounds += ['care_o_bot'] # https://github.com/ipa320/care-o-bot/issues/5
-            manual_workarounds += ['euslisp'] # missing build ids, also https://github.com/tork-a/euslisp-release/issues/1
+            manual_workarounds += ['euslisp'] # https://github.com/tork-a/euslisp-release/pull/4
             manual_workarounds += ['gazebo_ros_pkgs'] # https://github.com/ros-simulation/gazebo_ros_pkgs/pull/244
             manual_workarounds += ['jsk_common'] # https://github.com/jsk-ros-pkg/jsk_common/issues/649
             manual_workarounds += ['joystick_drivers'] # https://github.com/ros-drivers/joystick_drivers/pull/66
