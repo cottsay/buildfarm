@@ -90,12 +90,15 @@ def compute_missing(distros, arches, fqdn, rosdistro, sourcepkg_only=False, plat
 
         missing[short_package_name] = []
         for d in target_distros:
+            if platform == 'fedora':
+                version_extra = ".fc" + str(get_fedora_ver(d))
+            else:
+                version_extra = ".*"
             if not repo.pkg_in_repo(repo_url, pkg_name, get_full_version(expected_version, d, platform), d, arch='na', source=True, platform=platform):
                 missing[short_package_name].append('%s_source' % d)
             if not sourcepkg_only:
                 for a in arches:
-                    # TODO How the hell am I supposed to deal with this, Ubuntu?
-                    if not repo.pkg_in_repo(repo_url, pkg_name, str(expected_version) + ".*", d, a, platform=platform):
+                    if not repo.pkg_in_repo(repo_url, pkg_name, str(expected_version) + version_extra, d, a, platform=platform):
                         missing[short_package_name].append('%s_%s' % (d, a))
 
     if not sourcepkg_only and rosdistro == 'groovy' and not platform == 'fedora':
