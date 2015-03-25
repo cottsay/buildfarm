@@ -85,6 +85,10 @@ def trigger_if_necessary(da, pkg, rosdistro,
 if __name__ == '__main__':
     args = parse_options()
 
+    arches = args.arches
+    if 'amd64' in arches:
+        arches[arches.index('amd64')] = 'x86_64'
+
     missing = release_jobs.compute_missing(
         args.distros,
         args.arches,
