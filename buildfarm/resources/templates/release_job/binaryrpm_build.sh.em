@@ -84,6 +84,8 @@ echo ""
 rm -f $WORKSPACE/output/*.src.rpm
 
 if [ $RET -ne 0 ]; then
+  # Remove the downloaded source RPM as well (it might be big)
+  rm -f $WORKSPACE/workspace/*.src.rpm
   exit $RET
 else
   echo -n "Build finished: "
