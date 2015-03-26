@@ -80,15 +80,15 @@ echo ""
 echo "END BUILD LOG"
 echo ""
 
+# Remove the source RPM (that's already in the repo)
+rm -f $WORKSPACE/output/*.src.rpm
+
 if [ $RET -ne 0 ]; then
   exit $RET
 else
   echo -n "Build finished: "
   date
 fi
-
-# Remove the source RPM (that's already in the repo)
-rm -f $WORKSPACE/output/*.src.rpm
 
 # Run rpmlint (for stability testing)
 rpmlint $WORKSPACE/output/*.rpm 2>&1 | grep -v -e dir-or-file-in-opt -e devel-file-in-non-devel-package -e no-documentation || true
