@@ -28,13 +28,13 @@ if __name__ == "__main__":
     else:
         working = mktemp()
 
+    releasever = args.releasever
     variant = args.variant.replace('-', ' ').replace('_', ' ')
     variant_cap = variant.title()
-    fslabel = 'Fedora-ROS-%s-%s' % (args.rosdistro.title(), variant_cap.replace(' ', '-'))
+    fslabel = 'Fedora-%d-ROS-%s-%s' % (releasever, args.rosdistro.title(), variant_cap.replace(' ', '-'))
     ros_pkgs = 'ros-%s-%s' % (args.rosdistro, variant.replace(' ', '-'))
     template_file = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', 'resources', 'ks', 'fedora-ros-live.ks.em')
     kickstart_file = os.path.join(working, 'fedora-ros-live.ks')
-    releasever = args.releasever
 
     if not os.path.isdir(working):
         os.mkdir(working)
