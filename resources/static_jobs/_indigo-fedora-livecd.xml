@@ -53,7 +53,7 @@ mkdir -p $WORKSPACE/output
 $WORKSPACE/monitored_vcs/scripts/generate_fedora_livecd indigo desktop 21 --output=$WORKSPACE/output
 
 RET=0
-scp $WORKSPACE/output/*.iso rosbot@csc.mcs.sdsmt.edu:/mnt/storage/repos/smd-pub/fedora/linux/21/x86_64/live/ || RET=$?
+scp $WORKSPACE/output/*.iso rosbot@csc.mcs.sdsmt.edu:/mnt/storage/repos/smd-ros/fedora/linux/21/x86_64/live/ || RET=$?
 
 rm -rf $WORKSPACE/output
 
