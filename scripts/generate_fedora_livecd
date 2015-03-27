@@ -1,0 +1,62 @@
+#!/usr/bin/env python
+
+import em
+import os
+
+from shutil import rmtree
+from subprocess import Popen, CalledProcessError
+from tempfile import mktemp
+
+def parse_options():
+    import argparse
+    parser = argparse.ArgumentParser(description='Creates a Fedora Live ISO with ROS pre-installed.')
+    parser.add_argument('rosdistro', help='Which rosdistro to operate on.')
+    parser.add_argument('variant', help='The ROS variant to install. Default: %(default)s', default='desktop')
+    parser.add_argument('releasever', help='Fedora release version (20, 21, etc).', type=int)
+    parser.add_argument('--working', help='A download and working build path. Deleted on exit.')
+    parser.add_argument('--output', help='The result of source deb building will go here. Default: %(default)s', default='/tmp/ros_fedora_live')
+
+    args = parser.parse_args()
+
+    return args
+
+if __name__ == "__main__":
+    args = parse_options()
+
+    if args.working:
+        working = args.working
+    else:
+        working = mktemp()
+
+    variant = args.variant.replace('-', ' ').replace('_', ' ')
+    variant_cap = variant.title()
+    fslabel = 'Fedora-ROS-%s-%s' % (args.rosdistro.title(), variant_cap.replace(' ', '-'))
+    ros_pkgs = 'ros-%s-%s' % (args.rosdistro, variant.replace(' ', '-'))
+    template_file = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', 'resources', 'ks', 'fedora-ros-live.ks.em')
+    kickstart_file = os.path.join(working, 'fedora-ros-live.ks')
+    releasever = args.releasever
+
+    if not os.path.isdir(working):
+        os.mkdir(working)
+    if not os.path.isdir(args.output):
+        os.mkdir(args.output)
+
+    try:
+        ofile = open(kickstart_file, 'w')
+        interpreter = em.Interpreter(output=ofile)
+        interpreter.file(open(template_file), locals=locals())
+    finally:
+        if interpreter is not None:
+            interpreter.shutdown()
+        if ofile is not None:
+            ofile.close()
+
+    cmd = ['sudo', 'livecd-creator', '--verbose', '--config=' + kickstart_file, '--fslabel=' + fslabel, '--product=Fedora ' + str(releasever), '--title=Fedora ' + str(releasever) + ' ROS ' + variant_cap, '--releasever=' + str(releasever), '--tmpdir=' + working]
+    print('+' + ' '.join(cmd))
+    process = Popen(cmd, cwd=args.output)
+    output, unused_err = process.communicate()
+    retcode = process.poll()
+    if retcode:
+        raise CalledProcessError(retcode, command)
+
+    rmtree(working)
