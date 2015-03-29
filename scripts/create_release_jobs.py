@@ -157,16 +157,7 @@ def doit(rd, distros, arches, target_repository, fqdn, jobs_graph, rosdistro, pa
             manual_workarounds += ['stage_ros'] # https://github.com/ros-simulation/stage_ros/issues/14
             manual_workarounds += ['uwsim_bullet'] # https://github.com/uji-ros-pkg/uwsim_bullet/pull/1
             manual_workarounds += ['warehouse_ros'] # https://github.com/ros-planning/warehouse_ros/pull/17
-        elif rosdistro == 'hydro':
-            manual_workarounds += ['bride'] # Missing build ids
-            manual_workarounds += ['cob_driver'] # TODO
-            manual_workarounds += ['jsk_control'] # Differing bloom versions
-            manual_workarounds += ['jsk_roseus'] # Bad packaging practices
-            manual_workarounds += ['multisense_ros'] # https://bitbucket.org/crl/multisense_ros/pull-request/5
-            manual_workarounds += ['openni2_camera'] # valid branch has wrong rosdep entry for openni2-devel
-            manual_workarounds += ['robot_model'] # TODO: Testing
-            manual_workarounds += ['shadow_robot'] # Gazebo link directory issue
-            manual_workarounds += ['warehouse_ros'] # https://github.com/ros-planning/warehouse_ros/pull/17
+
         import re
         expected_tags = ['rpm/%s-%s_%s' % (rd.debianize_package_name(r.packages.keys()[0]), r.full_version, target_distro) for target_distro in target_distros]
         if r.name in manual_workarounds or None in [verify_tags(r.url, expected_tag) for expected_tag in expected_tags]:
