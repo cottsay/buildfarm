@@ -133,6 +133,8 @@ def doit(rd, distros, arches, target_repository, fqdn, jobs_graph, rosdistro, pa
             # manual_workarounds += ['bfl'] # https://github.com/ros-gbp/bfl-release/pull/9
             manual_workarounds += ['euslisp'] # https://github.com/tork-a/euslisp-release/pull/4
             # manual_workarounds += ['robot_upstart'] # missing daemontools
+            manual_workarounds += ['stage'] # https://github.com/ros-simulation/stage_ros/issues/14
+            manual_workarounds += ['stage_ros'] # https://github.com/ros-simulation/stage_ros/issues/14
             manual_workarounds += ['ueye_cam'] # https://github.com/anqixu/ueye_cam/pull/16
         elif rosdistro == 'indigo':
             manual_workarounds += ['ardrone_autonomy'] # https://github.com/AutonomyLab/ardronelib/pull/1
@@ -151,6 +153,8 @@ def doit(rd, distros, arches, target_repository, fqdn, jobs_graph, rosdistro, pa
             manual_workarounds += ['razer_hydra'] # udev rules...
             # manual_workarounds += ['robot_upstart'] # missing daemontools
             manual_workarounds += ['srv_tools'] # https://github.com/srv/srv_tools/pull/3
+            manual_workarounds += ['stage'] # https://github.com/ros-simulation/stage_ros/issues/14
+            manual_workarounds += ['stage_ros'] # https://github.com/ros-simulation/stage_ros/issues/14
             manual_workarounds += ['uwsim_bullet'] # https://github.com/uji-ros-pkg/uwsim_bullet/pull/1
             manual_workarounds += ['warehouse_ros'] # https://github.com/ros-planning/warehouse_ros/pull/17
         elif rosdistro == 'hydro':
