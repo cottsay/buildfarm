@@ -71,6 +71,9 @@ check_umount_mock_root
 # Kill any lingering processes (important if we're in a tmpfs)
 /usr/bin/mock --quiet --configdir $MOCK_CONF_DIR --root fedora-$DISTRO_VER-$ARCH-ros --resultdir $WORKSPACE/output --orphanskill
 
+# Remove the chroot (would be removed before next build anyway)
+/usr/bin/mock --quiet --configdir $MOCK_CONF_DIR --root fedora-$DISTRO_VER-$ARCH-ros --resultdir $WORKSPACE/output --clean
+
 # Output the build log for stability testing
 echo ""
 echo "BEGIN BUILD LOG"
