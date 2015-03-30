@@ -141,7 +141,7 @@ def doit(rd, distros, arches, target_repository, fqdn, jobs_graph, rosdistro, pa
             manual_workarounds += ['bride'] # Missing build ids
             manual_workarounds += ['care_o_bot'] # https://github.com/ipa320/care-o-bot/issues/5
             manual_workarounds += ['euslisp'] # https://github.com/tork-a/euslisp-release/pull/4
-            manual_workarounds += ['jsk_common'] # https://github.com/jsk-ros-pkg/jsk_common/issues/649
+            manual_workarounds += ['jsk_common'] # downward static link https://github.com/ros/rosdistro/pull/7679
             manual_workarounds += ['joystick_drivers'] # https://github.com/ros-drivers/joystick_drivers/pull/66
             manual_workarounds += ['libnabo'] # -DSHARED_LIBS:BOOL=ON (no official rpm branch yet)
             manual_workarounds += ['libpointmatcher'] # TODO: Not sure how to phrase this one yet
