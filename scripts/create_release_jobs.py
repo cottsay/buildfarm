@@ -130,33 +130,36 @@ def doit(rd, distros, arches, target_repository, fqdn, jobs_graph, rosdistro, pa
         # TODO: Workaround until repos have rpm branches
         manual_workarounds = []
         if rosdistro == 'jade':
+            pass
             # manual_workarounds += ['bfl'] # https://github.com/ros-gbp/bfl-release/pull/9
-            manual_workarounds += ['euslisp'] # https://github.com/tork-a/euslisp-release/pull/4
+            # manual_workarounds += ['euslisp'] # https://github.com/tork-a/euslisp-release/pull/4
             # manual_workarounds += ['robot_upstart'] # missing daemontools
-            manual_workarounds += ['stage'] # https://github.com/ros-simulation/stage_ros/issues/14
-            manual_workarounds += ['stage_ros'] # https://github.com/ros-simulation/stage_ros/issues/14
-            manual_workarounds += ['ueye_cam'] # https://github.com/anqixu/ueye_cam/pull/16
+            # manual_workarounds += ['stage'] # https://github.com/ros-simulation/stage_ros/issues/14
+            # manual_workarounds += ['stage_ros'] # https://github.com/ros-simulation/stage_ros/issues/14
+            # manual_workarounds += ['ueye_cam'] # https://github.com/anqixu/ueye_cam/pull/16
         elif rosdistro == 'indigo':
-            manual_workarounds += ['ardrone_autonomy'] # https://github.com/AutonomyLab/ardronelib/pull/1
-            manual_workarounds += ['bride'] # Missing build ids
-            manual_workarounds += ['care_o_bot'] # https://github.com/ipa320/care-o-bot/issues/5
-            manual_workarounds += ['euslisp'] # https://github.com/tork-a/euslisp-release/pull/4
-            manual_workarounds += ['hrpsys'] # https://bugzilla.redhat.com/1207045
-            manual_workarounds += ['joystick_drivers'] # https://github.com/ros-drivers/joystick_drivers/pull/66
-            manual_workarounds += ['libnabo'] # -DSHARED_LIBS:BOOL=ON (no official rpm branch yet)
-            manual_workarounds += ['libpointmatcher'] # TODO: Not sure how to phrase this one yet
-            manual_workarounds += ['librms'] # https://github.com/ros/rosdistro/pull/6619
-            manual_workarounds += ['neo_driver'] # https://github.com/neobotix/neo_driver/pull/3
-            manual_workarounds += ['ocl'] # https://github.com/ros/rosdistro/pull/6959
-            manual_workarounds += ['openni_camera'] # https://github.com/ros-drivers/openni_camera/pull/32
-            manual_workarounds += ['openni2_camera'] # valid branch has wrong rosdep entry for openni2-devel
-            manual_workarounds += ['razer_hydra'] # udev rules...
+            pass
+            # manual_workarounds += ['ardrone_autonomy'] # https://github.com/AutonomyLab/ardronelib/pull/1
+            # manual_workarounds += ['bride'] # Missing build ids
+            # manual_workarounds += ['care_o_bot'] # https://github.com/ipa320/care-o-bot/issues/5
+            # manual_workarounds += ['euslisp'] # https://github.com/tork-a/euslisp-release/pull/4
+            # manual_workarounds += ['graft'] # https://github.com/ros-perception/graft/issues/23
+            # manual_workarounds += ['hrpsys'] # https://bugzilla.redhat.com/1207045
+            # manual_workarounds += ['joystick_drivers'] # https://github.com/ros-drivers/joystick_drivers/pull/66
+            # manual_workarounds += ['libnabo'] # -DSHARED_LIBS:BOOL=ON (no official rpm branch yet)
+            # manual_workarounds += ['libpointmatcher'] # TODO: Not sure how to phrase this one yet
+            # manual_workarounds += ['librms'] # https://github.com/ros/rosdistro/pull/6619
+            # manual_workarounds += ['neo_driver'] # https://github.com/neobotix/neo_driver/pull/3
+            # manual_workarounds += ['ocl'] # https://github.com/ros/rosdistro/pull/6959
+            # manual_workarounds += ['openni_camera'] # https://github.com/ros-drivers/openni_camera/pull/32
+            # manual_workarounds += ['openni2_camera'] # valid branch has wrong rosdep entry for openni2-devel
+            # manual_workarounds += ['razer_hydra'] # udev rules...
             # manual_workarounds += ['robot_upstart'] # missing daemontools
-            manual_workarounds += ['srv_tools'] # https://github.com/srv/srv_tools/pull/3
-            manual_workarounds += ['stage'] # https://github.com/ros-simulation/stage_ros/issues/14
-            manual_workarounds += ['stage_ros'] # https://github.com/ros-simulation/stage_ros/issues/14
-            manual_workarounds += ['uwsim_bullet'] # https://github.com/uji-ros-pkg/uwsim_bullet/pull/1
-            manual_workarounds += ['warehouse_ros'] # https://github.com/ros-planning/warehouse_ros/pull/17
+            # manual_workarounds += ['srv_tools'] # https://github.com/srv/srv_tools/pull/3
+            # manual_workarounds += ['stage'] # https://github.com/ros-simulation/stage_ros/issues/14
+            # manual_workarounds += ['stage_ros'] # https://github.com/ros-simulation/stage_ros/issues/14
+            # manual_workarounds += ['uwsim_bullet'] # https://github.com/uji-ros-pkg/uwsim_bullet/pull/1
+            # manual_workarounds += ['warehouse_ros'] # https://github.com/ros-planning/warehouse_ros/pull/17
 
         import re
         expected_tags = ['rpm/%s-%s_%s' % (rd.debianize_package_name(r.packages.keys()[0]), r.full_version, target_distro) for target_distro in target_distros]
