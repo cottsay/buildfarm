@@ -91,6 +91,13 @@ def upload_source_rpm(distros, repo_fqdn, input_directory, packagename):
         call('/tmp/', cmd)
         upload_root_list += [da_upload_root]
 
+    # Sign the payload
+    folder_options = ' '.join(upload_root_list)
+    cmd = ("ssh rosbuild@%(repo_fqdn)s -- find %(folder_options)s -name *.rpm" % locals()).split()
+    rpm_list = ' '.join(call('/tmp/', cmd, pipe=subprocess.PIPE).split())
+    cmd = ("ssh rosbuild@%(repo_fqdn)s -- rpm-sign %(rpm_list)s" % locals()).split()
+    call('/tmp/', cmd)
+
     # list all the folders where data is expected in one operation
     folder_options = ['-f %s' % root for root in upload_root_list]
     for folder_option in folder_options:
