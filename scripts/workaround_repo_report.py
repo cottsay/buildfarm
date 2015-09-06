@@ -75,6 +75,7 @@ if __name__ == '__main__':
     num_invalid_workaround = 0
     num_missing_workaround = 0
     num_total = 0
+    num_failed = 0
 
     for repo_name in sorted(rd.get_repo_list()):
         if args.repos and repo_name not in args.repos:
@@ -92,6 +93,7 @@ if __name__ == '__main__':
         r_re = re.match(url_re, r.url)
         if not r_re:
             print('- unable to parse URL')
+            num_failed += 1
             continue
 
         real_org = r_re.group(3)
@@ -105,14 +107,20 @@ if __name__ == '__main__':
             real_repo = gh.get_repo('%s/%s' % (real_org, real_name))
         except:
             print('\033[91mfailed!\033[0m')
+            num_failed += 1
             continue
         else:
             print('done')
 
         # Check real repo for an RPM branch in our rosdistro
-        if verify_tag(real_repo, args.rosdistro, r.packages.keys()[0], r.full_version):
-            print('- \033[92malready has valid release repo\033[0m')
-            num_valid_release += 1
+        try:
+            if verify_tag(real_repo, args.rosdistro, r.packages.keys()[0], r.full_version):
+                print('- \033[92malready has valid release repo\033[0m')
+                num_valid_release += 1
+                continue
+        except ssl.SSLError:
+            print('\033[91mfailed to verify release repo!\033[0m')
+            num_failed += 1
             continue
 
         # Check for a workaround repo
@@ -146,4 +154,5 @@ if __name__ == '__main__':
     print('- \033[93mvalid workaround repo:\033[0m %d (%01.1f%%)' % (num_valid_workaround, 100.0 * num_valid_workaround / num_total))
     print('- \033[95minvalid workaround repo:\033[0m %d (%01.1f%%)' % (num_invalid_workaround, 100.0 * num_invalid_workaround / num_total))
     print('- \033[91mmissing workaround repo:\033[0m %d (%01.1f%%)' % (num_missing_workaround, 100.0 * num_missing_workaround / num_total))
+    print('- \033[91mfailures:\033[0m %d (%01.1f%%)' % (num_failed, 100.0 * num_failed / num_total))
     print('- total: %d' % (num_total,))
