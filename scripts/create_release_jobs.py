@@ -132,8 +132,6 @@ def doit(rd, distros, arches, target_repository, fqdn, jobs_graph, rosdistro, pa
         if rosdistro == 'jade':
             manual_workarounds += ['bfl'] # https://github.com/ros-gbp/bfl-release/pull/9
             manual_workarounds += ['robot_upstart'] # missing daemontools
-            manual_workarounds += ['stage'] # https://github.com/ros-gbp/stage-release/pull/7
-            manual_workarounds += ['stage_ros'] # https://github.com/ros-simulation/stage_ros/issues/14
             manual_workarounds += ['ueye_cam'] # https://github.com/anqixu/ueye_cam/pull/23
         elif rosdistro == 'indigo':
             pass
